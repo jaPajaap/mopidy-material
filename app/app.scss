@@ -17,7 +17,7 @@ body {
     flex: 1;
 }
 
-playlists {
+.main {
     flex: 1;
     overflow-y: auto;
 }
@@ -29,7 +29,6 @@ playlists {
 .player {
     position: relative;
     z-index: 1;
-    box-shadow: 0 0 8px rgba(0, 0, 0, .4);
 }
 
 .player__content {
@@ -49,10 +48,6 @@ playlists {
 
 .track-desc {
     font-weight: bold;
-}
-
-.track-position {
-    display: flex;
 }
 
 progress-bar {

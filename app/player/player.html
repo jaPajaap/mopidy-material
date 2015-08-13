@@ -1,12 +1,10 @@
 
-    <div class="player">
+    <div class="player md-whiteframe-z2">
 
-        <div class="track-position">
-            <progress-bar>
-                <slider style="width: {{currentTimePosition}}%"></slider>
-                <slider-knob style="left: {{currentTimePosition}}%"></slider-knob>
-            </progress-bar>
-        </div>
+        <progress-bar>
+            <slider style="width: {{currentTimePosition}}%"></slider>
+            <slider-knob style="left: {{currentTimePosition}}%"></slider-knob>
+        </progress-bar>
 
         <div class="player__content">
             <div class="player__left">
@@ -28,7 +26,9 @@
                         <md-icon class="material-icons">skip_previous</md-icon>
                     </md-button>
                     <md-button class="md-icon-button" aria-label="More" ng-click="pausePlay()">
-                        <md-icon class="material-icons md-48">{{ state === 'playing' ? 'pause_circle_filled' : 'play_circle_filled' }}</md-icon>
+                        <md-icon class="material-icons" ng-class="{
+                            'md-48': state !== 'playing'
+                        }">{{ state === 'playing' ? 'pause' : 'play_circle_filled' }}</md-icon>
                     </md-button>
                     <md-button class="md-icon-button" aria-label="More" ng-click="next()">
                         <md-icon class="material-icons">skip_next</md-icon>

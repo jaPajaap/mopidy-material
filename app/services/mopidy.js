@@ -3,7 +3,7 @@
 var Mopidy = require('mopidy');
 var _ = require('lodash');
 
-function ConnectMopidy($window, $q, $rootScope) {
+function ConnectMopidy($window, $q, $rootScope, AppSettings) {
     var mopidy;
     return {
         execute: function(method, args) {
@@ -27,7 +27,7 @@ function ConnectMopidy($window, $q, $rootScope) {
             return $q(function(resolve, reject) {
                 mopidy = new Mopidy({
                     callingConvention: 'by-position-or-by-name',
-                    webSocketUrl: 'ws://192.168.1.103:6680/mopidy/ws/'
+                    webSocketUrl: 'ws://' + AppSettings.mopidyServer + '/mopidy/ws/'
                 });
 
                 // Convert Mopidy events to Angular events

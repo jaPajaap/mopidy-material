@@ -34,6 +34,8 @@ angular.module('app').service('Util', require('./services/util.js'));
 angular.module('app').directive('container', require('./container/container'));
 angular.module('app').directive('player', require('./player/player'));
 angular.module('app').directive('playlists', require('./playlists/playlists'));
+angular.module('app').directive('settings', require('./settings/settings'));
+angular.module('app').directive('toolbar', require('./toolbar/toolbar'));
 
 
 angular.bootstrap(document.body, ['app']);

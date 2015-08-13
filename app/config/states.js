@@ -4,13 +4,24 @@ function States($stateProvider) {
     $stateProvider
         .state('app', {
             url: '/',
+            abstract: true,
             title: 'Mopidy',
-            template: '<playlists></playlists><player me="me"></player>',
+            template: '<toolbar></toolbar><div class="main" ui-view></div><player me="me"></player>',
             controller: AppController,
             resolve: {
                 mopidy: getMopidy,
                 me: getMe
             }
+        })
+        .state('app.playlists', {
+            url: '',
+            title: 'Playlists',
+            template: '<playlists></playlists>'
+        })
+        .state('app.settings', {
+            url: '/settings',
+            title: 'Settings',
+            template: '<settings></settings>'
         })
         .state('reconnect', {
             url: '/reconnect',

@@ -189,7 +189,6 @@ function Player($rootScope, $interval, Util, Spotify, AppSettings, Mopidy) {
                         $scope.favoritedTracks = _.map(res.items, function(item) {
                             return item.track.uri;
                         });
-                        console.log($scope.favoritesTracks);
                     })
             };
         }
