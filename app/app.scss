@@ -1,0 +1,144 @@
+@import 'styles/vars';
+@import 'styles/typography';
+body {
+    color: $font-color--dark;
+    background-color: $background--light;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.app {
+    margin: $half-space;
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    flex: 1;
+}
+
+playlists {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.browser {
+    flex: 1;
+}
+
+.player {
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 0 8px rgba(0, 0, 0, .4);
+}
+
+.player__content {
+    display: flex;
+    align-items: center;
+}
+
+.player__left {
+    flex: 1;
+}
+
+.player__middle {}
+
+.player__right {
+    flex: 1;
+}
+
+.track-desc {
+    font-weight: bold;
+}
+
+.track-position {
+    display: flex;
+}
+
+progress-bar {
+    display: block;
+    position: relative;
+    flex: 1;
+    height: 5px;
+    background-color: pink;
+}
+
+slider {
+    position: absolute;
+    height: 100%;
+    left: 0;
+    background-color: hotpink;
+}
+
+slider-knob {
+    position: absolute;
+    top: -2.5px;
+    margin-left: -5px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: hotpink;
+}
+
+.now-playing {
+    display: flex;
+    background-color: white;
+    align-items: center;
+}
+
+.now-playing__content {
+    padding: 20px;
+}
+
+.now-playing__artist {
+    display: block;
+}
+
+.now-playing__track {
+    display: block;
+    font-size: 14px;
+}
+
+md-icon {
+    height: initial;
+    width: initial;
+}
+
+md-icon .material-icons {
+    display: block !important;
+}
+
+// Rules for sizing the icon.
+.material-icons.md-18 {
+    font-size: 18px;
+}
+
+.material-icons.md-24 {
+    font-size: 24px;
+}
+
+.material-icons.md-36 {
+    font-size: 36px;
+}
+
+.material-icons.md-48 {
+    font-size: 48px;
+}
+
+// Rules for using icons as black on a light background.
+.material-icons.md-dark {
+    color: rgba(0, 0, 0, 0.54);
+}
+
+.material-icons.md-dark.md-inactive {
+    color: rgba(0, 0, 0, 0.26);
+}
+
+// Rules for using icons as white on a dark background.
+.material-icons.md-light {
+    color: rgba(255, 255, 255, 1);
+}
+
+.material-icons.md-light.md-inactive {
+    color: rgba(255, 255, 255, 0.3);
+}
