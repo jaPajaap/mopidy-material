@@ -8,7 +8,7 @@ require('angular-aria');
 require('angular-animate');
 require('angular-material');
 
-require("./app.scss");
+require('./app.scss');
 
 // create and bootstrap application
 

@@ -41,25 +41,27 @@ function getMopidy(Mopidy) {
 
 function getMe($q, $window, Spotify) {
     return Spotify.getCurrentUser()
-        .catch(loginAndlistenForToken)
-        .then(function() {
-            return Spotify.getCurrentUser();
+        .catch(function() {
+            return Spotify.login()
         })
-    function loginAndlistenForToken() {
-        return $q(function(resolve, reject) {
-            $window.addEventListener("message", function(event) {
-                console.log('got postmessage', event);
-                var hash = JSON.parse(event.data);
-                if (hash.type == 'access_token') {
-                    Spotify.setAuthToken(hash.access_token);
-                    localStorage.setItem('spotify-token', hash.access_token);
-                    resolve(Spotify);
-                }
-                reject();
-            }, false);
-            Spotify.login();
-        });
-    }
+        .then(function() {
+            return Spotify.getCurrentUser()
+        })
 }
+    // function loginAndlistenForToken() {
+    //     return $q(function(resolve, reject) {
+    //         $window.addEventListener("message", function(event) {
+    //             console.log('got postmessage', event);
+    //             var hash = JSON.parse(event.data);
+    //             if (hash.type == 'access_token') {
+    //                 Spotify.setAuthToken(hash.access_token);
+    //                 localStorage.setItem('spotify-token', hash.access_token);
+    //                 resolve(Spotify);
+    //             }
+    //             reject();
+    //         }, false);
+    //         Spotify.login();
+    //     });
+    // }
 
 module.exports = States;

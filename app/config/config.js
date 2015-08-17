@@ -4,8 +4,8 @@
  * @ngInject
  */
 function OnConfig(AppSettings, $locationProvider, $urlRouterProvider, SpotifyProvider) {
-    $locationProvider.html5Mode(true);
     $urlRouterProvider.otherwise('/');
+    $locationProvider.html5Mode(true);
 
     SpotifyProvider.setClientId(AppSettings.spotifyClientId);
     SpotifyProvider.setScope('user-read-private playlist-modify-public playlist-modify-private');
