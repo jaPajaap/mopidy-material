@@ -1,23 +1,12 @@
 {
-  "name": "angularjs-gulp-browserify-boilerplate",
-  "version": "0.1.0",
-  "author": "Jake Marsh <jakemmarsh@gmail.com>",
-  "description": "Boilerplate using AngularJS, SASS, Gulp, and Browserify while also utilizing best practices.",
+  "name": "mopidy-material",
+  "version": "0.0.1",
+  "author": "Jaap Gerritsen <jaapgerritsen@gmail.com>",
+  "description": "Mopidy material design client",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jakemmarsh/angularjs-gulp-browserify-boilerplate.git"
+    "url": "https://github.com/japajaap/mopidy-material.git"
   },
-  "keywords": [
-    "express",
-    "gulp",
-    "browserify",
-    "angular",
-    "sass",
-    "karma",
-    "jasmine",
-    "protractor",
-    "boilerplate"
-  ],
   "private": true,
   "engines": {
     "node": ">=0.12.x"
