@@ -45,20 +45,15 @@ function Player($rootScope, $interval, Util, Spotify, AppSettings, Mopidy) {
 
             function handleTrackPlaybackResumed (e, args) {
                 console.log('handleTrackPlaybackResumed');
-                // setTrack(e.tl_track.track);
-                // setTimePosition(e.time_position);
             }
 
             function handleTrackPlaybackStarted (e, args) {
                 console.log('handleTrackPlaybackResumed');
                 setTrack(args.tl_track.track);
-                // setTimePosition(args.time_position);
             }
 
             function handleTrackPlaybackPaused (e, args) {
                 console.log('handleTrackPlaybackPaused');
-                // setTrack(args.tl_track.track);
-                // setTimePosition(args.time_position);
             }
 
 
@@ -94,7 +89,7 @@ function Player($rootScope, $interval, Util, Spotify, AppSettings, Mopidy) {
             }
 
             function startCheckingTimePosition() {
-                checkPositionTimer = $interval(checkTimePosition, 1000);
+                checkPositionTimer = $interval(getTimePosition, 1000);
             }
 
             function stopCheckingTimePosition() {
@@ -109,7 +104,7 @@ function Player($rootScope, $interval, Util, Spotify, AppSettings, Mopidy) {
                 $scope.currentTrackPosition = Util.timeFromMilliSeconds(0);
             }
 
-            function setTimePosition(timePosition) {
+            function storeTimePosition(timePosition) {
                 if ($scope.track.length > 0 && timePosition > 0) {
                     $scope.currentTimePosition = (timePosition / $scope.track.length) * 100;
                     $scope.currentTrackPosition = Util.timeFromMilliSeconds(timePosition);
@@ -118,10 +113,23 @@ function Player($rootScope, $interval, Util, Spotify, AppSettings, Mopidy) {
                 }
             }
 
-            function checkTimePosition() {
+            $scope.$watch('currentTimePosition', seek);
+
+            function seek(n, o) {
+                // TODO: check logic
+                if(n > o + 5 || n < o - 5) {
+                    stopCheckingTimePosition()
+                    var timePosition = n / 100 * $scope.track.length
+                    return Mopidy.execute('playback.seek', {time_position: timePosition})
+                        .then(startCheckingTimePosition);
+                }
+                
+            }
+
+            function getTimePosition() {
                 if ($scope.state === 'playing') {
                     Mopidy.execute('playback.getTimePosition')
-                        .then(setTimePosition);
+                        .then(storeTimePosition);
                 }
                 return;
             }

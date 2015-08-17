@@ -9,7 +9,7 @@ function ConnectMopidy($window, $q, $rootScope, AppSettings) {
         execute: function(method, args) {
             
             return $q(function(resolve, reject) {
-                console.log(method, args);
+                // console.log(method, args);
                 if(!args) {
                     return _.get(mopidy, method)()
                         .then(resolve);

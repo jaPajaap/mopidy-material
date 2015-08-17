@@ -58,21 +58,15 @@ progress-bar {
     background-color: pink;
 }
 
-slider {
+.slider {
     position: absolute;
-    height: 100%;
-    left: 0;
-    background-color: hotpink;
-}
-
-slider-knob {
-    position: absolute;
-    top: -2.5px;
-    margin-left: -5px;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background-color: hotpink;
+    width: 100%;
+    z-index: 1;
+    top: -24px;
+    margin-left: 0;
+    margin-right: 0;
+    // padding-left: 4px;
+    // padding-right: 4px;
 }
 
 .now-playing {

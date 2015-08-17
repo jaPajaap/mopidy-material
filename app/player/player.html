@@ -1,10 +1,8 @@
 
     <div class="player md-whiteframe-z2">
 
-        <progress-bar>
-            <slider style="width: {{currentTimePosition}}%"></slider>
-            <slider-knob style="left: {{currentTimePosition}}%"></slider-knob>
-        </progress-bar>
+        <md-slider class="slider" aria-label="slider" flex min="0" max="100" ng-model="currentTimePosition" step="0.1">
+        </md-slider>
 
         <div class="player__content">
             <div class="player__left">
