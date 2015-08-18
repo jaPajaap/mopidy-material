@@ -1,9 +1,13 @@
 'use strict';
 
-function States($stateProvider) {
+function States($urlRouterProvider, $stateProvider) {
+
+    $urlRouterProvider.otherwise('/')
+    
+
     $stateProvider
         .state('app', {
-            url: '/',
+            url: '',
             abstract: true,
             title: 'Mopidy',
             template: '<toolbar></toolbar><div class="main" ui-view></div><player me="me"></player>',
@@ -14,7 +18,7 @@ function States($stateProvider) {
             }
         })
         .state('app.playlists', {
-            url: '',
+            url: '/',
             title: 'Playlists',
             template: '<playlists></playlists>'
         })

@@ -3,8 +3,7 @@
 /**
  * @ngInject
  */
-function OnConfig(AppSettings, $locationProvider, $urlRouterProvider, SpotifyProvider) {
-    $urlRouterProvider.otherwise('/');
+function OnConfig($locationProvider, AppSettings, SpotifyProvider) {
     $locationProvider.html5Mode(true);
 
     SpotifyProvider.setClientId(AppSettings.spotifyClientId);
