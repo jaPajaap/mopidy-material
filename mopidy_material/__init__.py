@@ -3,8 +3,6 @@ from __future__ import unicode_literals
 import logging
 import os
 
-import tornado.web
-
 from mopidy import config, ext
 
 __ext_name__ = 'material'
