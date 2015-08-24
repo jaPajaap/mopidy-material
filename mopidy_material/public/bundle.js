@@ -55277,7 +55277,7 @@
 	  appTitle: 'Mopidy',
 	  starredPlaylistId: '45AW0U4mHoXBA7GEKeE5Jq',
 	  spotifyClientId: '453d62ba1a244e8780eb53e3fcc4ccac',
-	  appServer: 'http://localhost:8080',
+	  appUrl: 'http://192.168.1.103:6680/material',
 	  mopidyServer: 'localhost:6680'
 	};
 
@@ -55293,11 +55293,9 @@
 	 * @ngInject
 	 */
 	function OnConfig($locationProvider, AppSettings, SpotifyProvider) {
-	    $locationProvider.html5Mode(true);
-
 	    SpotifyProvider.setClientId(AppSettings.spotifyClientId);
 	    SpotifyProvider.setScope('user-read-private playlist-modify-public playlist-modify-private');
-	    SpotifyProvider.setRedirectUri(AppSettings.appServer +'/callback.html');
+	    SpotifyProvider.setRedirectUri(AppSettings.appUrl +'/callback.html');
 	    SpotifyProvider.setAuthToken(localStorage.getItem('spotify-token'));
 
 
