@@ -14,7 +14,7 @@ var common = {
     module: {
         loaders: [{
             test: /\.scss$/,
-            loader: 'style!css!sass'
+            loader: 'style!css!autoprefixer?browsers=last 2 versions!sass'
         }, {
             test: /\.html$/,
             loader: "ngtemplate?relativeTo=app/!html"
