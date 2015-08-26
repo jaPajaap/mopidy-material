@@ -1,10 +1,19 @@
+//external
 @import url(https://fonts.googleapis.com/icon?family=Material+Icons);
 @import url(https://ajax.googleapis.com/ajax/libs/angular_material/0.10.1/angular-material.min.css);
 @import url(https://fonts.googleapis.com/css?family=RobotoDraft:300,400,500,700,400italic);
 
+
+//mixins
+@import '~include-media/dist/include-media';
+
+
+//vars
 @import 'styles/vars';
 @import 'styles/typography';
 
+
+//style
 body {
     color: $font-color--dark;
     background-color: $background--light;
@@ -15,12 +24,18 @@ body {
 }
 
 #app {
-    margin: $half-space;
+    margin: 0;
     display: flex;
     flex-direction: column;
     background-color: #fff;
     flex: 1;
+    
+    @include media(">=tablet") {
+        margin: $half-space;
+    }
+    
 }
+
 
 .main {
     flex: 1;
