@@ -30,7 +30,7 @@ function States($urlRouterProvider, $stateProvider) {
         .state('reconnect', {
             url: '/reconnect',
             title: 'Reconnect',
-            template: '<h1>Mopidy connection error</h1><a ui-sref="app">reconnect</a>'
+            template: '<h1>Mopidy connection error</h1><a ui-sref="app.playlists">reconnect</a>'
         });
 }
 
