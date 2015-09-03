@@ -1,10 +1,8 @@
 <div class="playlists">
     <md-list>
-        <md-list-item class="md-3-line" ng-repeat="playlist in playlists" ng-click="addAndPlay(playlist.uri)">
-            <!-- <img ng-src="{{item.face}}?{{$index}}" class="md-avatar" alt="{{item.who}}" /> -->
-            <div class="md-list-item-text">
-                {{ playlist.name }}
-            </div>
+        <md-list-item class="md-with-secondary--hover" ng-repeat="playlist in playlists" ng-click="showPlaylist(playlist.uri)">
+            <p>{{ playlist.name }}</p>
+            <md-icon class="md-secondary material-icons" ng-click="addAndPlay(playlist.uri)">play_arrow</md-icon>
         </md-list-item>
     </md-list>
 </div>

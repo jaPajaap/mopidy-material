@@ -2,15 +2,14 @@
 
 function States($urlRouterProvider, $stateProvider) {
 
-    $urlRouterProvider.otherwise('/')
+    $urlRouterProvider.otherwise('/playlists')
     
 
     $stateProvider
         .state('app', {
             url: '',
             abstract: true,
-            title: 'Mopidy',
-            template: '<toolbar></toolbar><div class="main" ui-view></div><player me="me"></player>',
+            template: '<ui-view class="container"></ui-view><player me="me"></player>',
             controller: AppController,
             resolve: {
                 mopidy: getMopidy,
@@ -18,18 +17,32 @@ function States($urlRouterProvider, $stateProvider) {
             }
         })
         .state('app.playlists', {
-            url: '/',
-            title: 'Playlists',
-            template: '<playlists></playlists>'
+            url: '/playlists',
+            name: 'Playlists',
+            views: {
+                '@app': {
+                    template: '<playlists-container></playlists-container>'
+                }
+            }
         })
+            .state('app.playlists.show', {
+                url: '/:playlistUri',
+                name: 'Playlist',
+                views: {
+                    '@app': {
+                        controller: function($scope, $state) {
+                            $scope.playlistUri = $state.params.playlistUri;
+                        },
+                        template: '<playlist-container uri="{{ playlistUri }}"></playlist-container>'
+                    }
+                }
+            })
         .state('app.settings', {
             url: '/settings',
-            title: 'Settings',
             template: '<settings></settings>'
         })
         .state('reconnect', {
             url: '/reconnect',
-            title: 'Reconnect',
             template: '<h1>Mopidy connection error</h1><a ui-sref="app.playlists">reconnect</a>'
         });
 }

@@ -2,7 +2,7 @@
 
 var template = require('./player.html');
 
-function Player($rootScope, $interval, Util, Spotify, AppSettings, Mopidy) {
+function Player($rootScope, $interval, Util, Spotify, AppSettings, Mopidy, hotkeys) {
     return {
         restrict: 'E',
         templateUrl: template,
@@ -29,6 +29,14 @@ function Player($rootScope, $interval, Util, Spotify, AppSettings, Mopidy) {
             $rootScope.$on('mopidy:event:trackPlaybackResumed', handleTrackPlaybackResumed)
             $rootScope.$on('mopidy:event:trackPlaybackPaused', handleTrackPlaybackPaused)
             $rootScope.$on('mopidy:event:trackPlaybackEnded', handleTrackPlaybackEnded)
+
+            hotkeys.add({
+                combo: 'space',
+                description: 'Pause / Play',
+                callback: function() {
+                  $scope.pausePlay();
+                }
+              });
 
             init()
 

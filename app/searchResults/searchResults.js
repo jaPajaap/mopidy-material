@@ -1,24 +1,18 @@
 'use strict';
 
-var template = require('./playlists.html')
+var template = require('./searchResults.html')
 
-function Playlists($state, Mopidy) {
+function searchResults($state, Mopidy) {
     return {
         restrict: 'E',
         templateUrl: template,
+        scope: {
+            results: '='
+        },
         controller: function($scope) {
-            $scope.playlists = [];
             $scope.addAndPlay = addAndPlay;
             $scope.showPlaylist = showPlaylist;
             
-            getPlaylists();
-
-            function getPlaylists() {
-                return Mopidy.execute('playlists.getPlaylists')
-                .then(function setPlaylists(playlists) {
-                    $scope.playlists = playlists;
-                });
-            }
             function addAndPlay (uri) {    
                 return Mopidy.execute('tracklist.clear')
                 .then(Mopidy.execute('tracklist.add', {uri: uri}))
@@ -29,9 +23,8 @@ function Playlists($state, Mopidy) {
             function showPlaylist (uri) {
                 return $state.go('.show', {playlistUri: uri});
             }
-
         }
     }
 }
 
-module.exports = Playlists;
+module.exports = searchResults;

@@ -7,6 +7,7 @@ require('angular-spotify');
 require('angular-aria');
 require('angular-animate');
 require('angular-material');
+require('angular-hotkeys');
 
 require('./app.scss');
 
@@ -15,7 +16,8 @@ require('./app.scss');
 var requires = [
     'spotify',
     'ui.router',
-    'ngMaterial'
+    'ngMaterial',
+    'cfp.hotkeys'
 ];
 
 // mount on window for testing
@@ -33,7 +35,13 @@ angular.module('app').service('Util', require('./services/util.js'));
 
 angular.module('app').directive('container', require('./container/container'));
 angular.module('app').directive('player', require('./player/player'));
+angular.module('app').directive('searchResults', require('./searchResults/searchResults'));
+angular.module('app').directive('playlistsContainer', require('./playlists/container'));
 angular.module('app').directive('playlists', require('./playlists/playlists'));
+angular.module('app').directive('playlistsToolbar', require('./playlists/toolbar'));
+angular.module('app').directive('playlistContainer', require('./playlist/container'));
+angular.module('app').directive('playlist', require('./playlist/playlist'));
+angular.module('app').directive('playlistToolbar', require('./playlist/toolbar'));
 angular.module('app').directive('settings', require('./settings/settings'));
 angular.module('app').directive('toolbar', require('./toolbar/toolbar'));
 

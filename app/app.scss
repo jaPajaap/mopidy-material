@@ -2,17 +2,11 @@
 @import url(https://fonts.googleapis.com/icon?family=Material+Icons);
 @import url(https://ajax.googleapis.com/ajax/libs/angular_material/0.10.1/angular-material.min.css);
 @import url(https://fonts.googleapis.com/css?family=RobotoDraft:300,400,500,700,400italic);
-
-
 //mixins
 @import '~include-media/dist/include-media';
-
-
 //vars
 @import 'styles/vars';
 @import 'styles/typography';
-
-
 //style
 body {
     color: $font-color--dark;
@@ -29,13 +23,44 @@ body {
     flex-direction: column;
     background-color: #fff;
     flex: 1;
-    
     @include media(">=tablet") {
         margin: $half-space;
     }
-    
 }
 
+%container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+}
+
+.container,
+playlist-container,
+playlists-container {
+    @extend %container
+}
+
+playlists-container {
+    md-input-container {
+        flex: 1;
+        // background-color: rgba(#fff, .1);
+        padding: 2px;
+        &:not(.md-input-invalid) > md-icon.search {
+            color: #fff;
+        }
+        .md-input {
+            color: #fff;
+        }
+    }
+}
+
+search-results {
+    md-divider {
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+}
 
 .main {
     flex: 1;
@@ -49,6 +74,7 @@ body {
 .player {
     position: relative;
     z-index: 1;
+    box-shadow: 0 0 8px rgba(0,0,0,.2);
 }
 
 .player__content {

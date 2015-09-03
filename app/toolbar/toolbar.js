@@ -6,10 +6,7 @@ function Toolbar() {
     return {
         restrict: 'E',
         templateUrl: template,
-        controller: function($scope, $rootScope) {
-            $scope.stateTitle = $rootScope.pageTitle;
-
-        }
+        transclude: true
     }
 }
 
