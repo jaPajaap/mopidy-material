@@ -53,35 +53,43 @@
 	__webpack_require__(5);
 	__webpack_require__(7);
 	__webpack_require__(9);
-
 	__webpack_require__(11);
+
+	__webpack_require__(12);
 
 	// create and bootstrap application
 
 	var requires = [
 	    'spotify',
 	    'ui.router',
-	    'ngMaterial'
+	    'ngMaterial',
+	    'cfp.hotkeys'
 	];
 
 	// mount on window for testing
 	angular.module('app', requires);
 
-	angular.module('app').constant('AppSettings', __webpack_require__(15));
+	angular.module('app').constant('AppSettings', __webpack_require__(16));
 
-	angular.module('app').config(__webpack_require__(16));
 	angular.module('app').config(__webpack_require__(17));
+	angular.module('app').config(__webpack_require__(18));
 
-	angular.module('app').run(__webpack_require__(18));
+	angular.module('app').run(__webpack_require__(19));
 
-	angular.module('app').service('Mopidy', __webpack_require__(19));
-	angular.module('app').service('Util', __webpack_require__(47));
+	angular.module('app').service('Mopidy', __webpack_require__(20));
+	angular.module('app').service('Util', __webpack_require__(48));
 
-	angular.module('app').directive('container', __webpack_require__(48));
-	angular.module('app').directive('player', __webpack_require__(49));
-	angular.module('app').directive('playlists', __webpack_require__(51));
-	angular.module('app').directive('settings', __webpack_require__(53));
-	angular.module('app').directive('toolbar', __webpack_require__(55));
+	angular.module('app').directive('container', __webpack_require__(49));
+	angular.module('app').directive('player', __webpack_require__(50));
+	angular.module('app').directive('searchResults', __webpack_require__(52));
+	angular.module('app').directive('playlistsContainer', __webpack_require__(54));
+	angular.module('app').directive('playlists', __webpack_require__(56));
+	angular.module('app').directive('playlistsToolbar', __webpack_require__(58));
+	angular.module('app').directive('playlistContainer', __webpack_require__(60));
+	angular.module('app').directive('playlist', __webpack_require__(62));
+	angular.module('app').directive('playlistToolbar', __webpack_require__(64));
+	angular.module('app').directive('settings', __webpack_require__(66));
+	angular.module('app').directive('toolbar', __webpack_require__(68));
 
 
 	angular.bootstrap(document.body, ['app']);
@@ -54948,13 +54956,1647 @@
 /* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var __WEBPACK_AMD_DEFINE_RESULT__;/*! 
+	 * angular-hotkeys v1.5.0
+	 * https://chieffancypants.github.io/angular-hotkeys
+	 * Copyright (c) 2015 Wes Cruver
+	 * License: MIT
+	 */
+	/*
+	 * angular-hotkeys
+	 *
+	 * Automatic keyboard shortcuts for your angular apps
+	 *
+	 * (c) 2014 Wes Cruver
+	 * License: MIT
+	 */
+
+	(function() {
+
+	  'use strict';
+
+	  angular.module('cfp.hotkeys', []).provider('hotkeys', ['$injector', function($injector) {
+
+	    /**
+	     * Configurable setting to disable the cheatsheet entirely
+	     * @type {Boolean}
+	     */
+	    this.includeCheatSheet = true;
+
+	    /**
+	     * Configurable setting to disable ngRoute hooks
+	     * @type {Boolean}
+	     */
+	    this.useNgRoute = $injector.has('ngViewDirective');
+
+	    /**
+	     * Configurable setting for the cheat sheet title
+	     * @type {String}
+	     */
+
+	    this.templateTitle = 'Keyboard Shortcuts:';
+
+	    /**
+	     * Configurable settings for the cheat sheet header and footer.  Both are HTML, and the header
+	     * overrides the normal title if specified.
+	     * @type {String}
+	     */
+	    this.templateHeader = null;
+	    this.templateFooter = null;
+
+	    /**
+	     * Cheat sheet template in the event you want to totally customize it.
+	     * @type {String}
+	     */
+	    this.template = '<div class="cfp-hotkeys-container fade" ng-class="{in: helpVisible}" style="display: none;"><div class="cfp-hotkeys">' +
+	                      '<h4 class="cfp-hotkeys-title" ng-if="!header">{{ title }}</h4>' +
+	                      '<div ng-bind-html="header" ng-if="header"></div>' +
+	                      '<table><tbody>' +
+	                        '<tr ng-repeat="hotkey in hotkeys | filter:{ description: \'!$$undefined$$\' }">' +
+	                          '<td class="cfp-hotkeys-keys">' +
+	                            '<span ng-repeat="key in hotkey.format() track by $index" class="cfp-hotkeys-key">{{ key }}</span>' +
+	                          '</td>' +
+	                          '<td class="cfp-hotkeys-text">{{ hotkey.description }}</td>' +
+	                        '</tr>' +
+	                      '</tbody></table>' +
+	                      '<div ng-bind-html="footer" ng-if="footer"></div>' +
+	                      '<div class="cfp-hotkeys-close" ng-click="toggleCheatSheet()">×</div>' +
+	                    '</div></div>';
+
+	    /**
+	     * Configurable setting for the cheat sheet hotkey
+	     * @type {String}
+	     */
+	    this.cheatSheetHotkey = '?';
+
+	    /**
+	     * Configurable setting for the cheat sheet description
+	     * @type {String}
+	     */
+	    this.cheatSheetDescription = 'Show / hide this help menu';
+
+	    this.$get = ['$rootElement', '$rootScope', '$compile', '$window', '$document', function ($rootElement, $rootScope, $compile, $window, $document) {
+
+	      // monkeypatch Mousetrap's stopCallback() function
+	      // this version doesn't return true when the element is an INPUT, SELECT, or TEXTAREA
+	      // (instead we will perform this check per-key in the _add() method)
+	      Mousetrap.prototype.stopCallback = function(event, element) {
+	        // if the element has the class "mousetrap" then no need to stop
+	        if ((' ' + element.className + ' ').indexOf(' mousetrap ') > -1) {
+	          return false;
+	        }
+
+	        return (element.contentEditable && element.contentEditable == 'true');
+	      };
+
+	      /**
+	       * Convert strings like cmd into symbols like ⌘
+	       * @param  {String} combo Key combination, e.g. 'mod+f'
+	       * @return {String}       The key combination with symbols
+	       */
+	      function symbolize (combo) {
+	        var map = {
+	          command   : '⌘',
+	          shift     : '⇧',
+	          left      : '←',
+	          right     : '→',
+	          up        : '↑',
+	          down      : '↓',
+	          'return'  : '↩',
+	          backspace : '⌫'
+	        };
+	        combo = combo.split('+');
+
+	        for (var i = 0; i < combo.length; i++) {
+	          // try to resolve command / ctrl based on OS:
+	          if (combo[i] === 'mod') {
+	            if ($window.navigator && $window.navigator.platform.indexOf('Mac') >=0 ) {
+	              combo[i] = 'command';
+	            } else {
+	              combo[i] = 'ctrl';
+	            }
+	          }
+
+	          combo[i] = map[combo[i]] || combo[i];
+	        }
+
+	        return combo.join(' + ');
+	      }
+
+	      /**
+	       * Hotkey object used internally for consistency
+	       *
+	       * @param {array}    combo       The keycombo. it's an array to support multiple combos
+	       * @param {String}   description Description for the keycombo
+	       * @param {Function} callback    function to execute when keycombo pressed
+	       * @param {string}   action      the type of event to listen for (for mousetrap)
+	       * @param {array}    allowIn     an array of tag names to allow this combo in ('INPUT', 'SELECT', and/or 'TEXTAREA')
+	       * @param {Boolean}  persistent  Whether the hotkey persists navigation events
+	       */
+	      function Hotkey (combo, description, callback, action, allowIn, persistent) {
+	        // TODO: Check that the values are sane because we could
+	        // be trying to instantiate a new Hotkey with outside dev's
+	        // supplied values
+
+	        this.combo = combo instanceof Array ? combo : [combo];
+	        this.description = description;
+	        this.callback = callback;
+	        this.action = action;
+	        this.allowIn = allowIn;
+	        this.persistent = persistent;
+	        this._formated = null;
+	      }
+
+	      /**
+	       * Helper method to format (symbolize) the key combo for display
+	       *
+	       * @return {[Array]} An array of the key combination sequence
+	       *   for example: "command+g c i" becomes ["⌘ + g", "c", "i"]
+	       *
+	       */
+	      Hotkey.prototype.format = function() {
+	        if(this._formated === null) {
+	          // Don't show all the possible key combos, just the first one.  Not sure
+	          // of usecase here, so open a ticket if my assumptions are wrong
+	          var combo = this.combo[0];
+
+	          var sequence = combo.split(/[\s]/);
+	          for (var i = 0; i < sequence.length; i++) {
+	            sequence[i] = symbolize(sequence[i]);
+	          }
+	          this._formated = sequence;
+	        }
+
+	        return this._formated;
+	      };
+
+	      /**
+	       * A new scope used internally for the cheatsheet
+	       * @type {$rootScope.Scope}
+	       */
+	      var scope = $rootScope.$new();
+
+	      /**
+	       * Holds an array of Hotkey objects currently bound
+	       * @type {Array}
+	       */
+	      scope.hotkeys = [];
+
+	      /**
+	       * Contains the state of the help's visibility
+	       * @type {Boolean}
+	       */
+	      scope.helpVisible = false;
+
+	      /**
+	       * Holds the title string for the help menu
+	       * @type {String}
+	       */
+	      scope.title = this.templateTitle;
+
+	      /**
+	       * Holds the header HTML for the help menu
+	       * @type {String}
+	       */
+	      scope.header = this.templateHeader;
+
+	      /**
+	       * Holds the footer HTML for the help menu
+	       * @type {String}
+	       */
+	      scope.footer = this.templateFooter;
+
+	      /**
+	       * Expose toggleCheatSheet to hotkeys scope so we can call it using
+	       * ng-click from the template
+	       * @type {function}
+	       */
+	      scope.toggleCheatSheet = toggleCheatSheet;
+
+
+	      /**
+	       * Holds references to the different scopes that have bound hotkeys
+	       * attached.  This is useful to catch when the scopes are `$destroy`d and
+	       * then automatically unbind the hotkey.
+	       *
+	       * @type {Array}
+	       */
+	      var boundScopes = [];
+
+	      if (this.useNgRoute) {
+	        $rootScope.$on('$routeChangeSuccess', function (event, route) {
+	          purgeHotkeys();
+
+	          if (route && route.hotkeys) {
+	            angular.forEach(route.hotkeys, function (hotkey) {
+	              // a string was given, which implies this is a function that is to be
+	              // $eval()'d within that controller's scope
+	              // TODO: hotkey here is super confusing.  sometimes a function (that gets turned into an array), sometimes a string
+	              var callback = hotkey[2];
+	              if (typeof(callback) === 'string' || callback instanceof String) {
+	                hotkey[2] = [callback, route];
+	              }
+
+	              // todo: perform check to make sure not already defined:
+	              // this came from a route, so it's likely not meant to be persistent
+	              hotkey[5] = false;
+	              _add.apply(this, hotkey);
+	            });
+	          }
+	        });
+	      }
+
+
+
+	      // Auto-create a help menu:
+	      if (this.includeCheatSheet) {
+	        var document = $document[0];
+	        var element = $rootElement[0];
+	        var helpMenu = angular.element(this.template);
+	        _add(this.cheatSheetHotkey, this.cheatSheetDescription, toggleCheatSheet);
+
+	        // If $rootElement is document or documentElement, then body must be used
+	        if (element === document || element === document.documentElement) {
+	          element = document.body;
+	        }
+
+	        angular.element(element).append($compile(helpMenu)(scope));
+	      }
+
+
+	      /**
+	       * Purges all non-persistent hotkeys (such as those defined in routes)
+	       *
+	       * Without this, the same hotkey would get recreated everytime
+	       * the route is accessed.
+	       */
+	      function purgeHotkeys() {
+	        var i = scope.hotkeys.length;
+	        while (i--) {
+	          var hotkey = scope.hotkeys[i];
+	          if (hotkey && !hotkey.persistent) {
+	            _del(hotkey);
+	          }
+	        }
+	      }
+
+	      /**
+	       * Toggles the help menu element's visiblity
+	       */
+	      var previousEsc = false;
+
+	      function toggleCheatSheet() {
+	        scope.helpVisible = !scope.helpVisible;
+
+	        // Bind to esc to remove the cheat sheet.  Ideally, this would be done
+	        // as a directive in the template, but that would create a nasty
+	        // circular dependency issue that I don't feel like sorting out.
+	        if (scope.helpVisible) {
+	          previousEsc = _get('esc');
+	          _del('esc');
+
+	          // Here's an odd way to do this: we're going to use the original
+	          // description of the hotkey on the cheat sheet so that it shows up.
+	          // without it, no entry for esc will ever show up (#22)
+	          _add('esc', previousEsc.description, toggleCheatSheet, null, ['INPUT', 'SELECT', 'TEXTAREA']);
+	        } else {
+	          _del('esc');
+
+	          // restore the previously bound ESC key
+	          if (previousEsc !== false) {
+	            _add(previousEsc);
+	          }
+	        }
+	      }
+
+	      /**
+	       * Creates a new Hotkey and creates the Mousetrap binding
+	       *
+	       * @param {string}   combo       mousetrap key binding
+	       * @param {string}   description description for the help menu
+	       * @param {Function} callback    method to call when key is pressed
+	       * @param {string}   action      the type of event to listen for (for mousetrap)
+	       * @param {array}    allowIn     an array of tag names to allow this combo in ('INPUT', 'SELECT', and/or 'TEXTAREA')
+	       * @param {boolean}  persistent  if true, the binding is preserved upon route changes
+	       */
+	      function _add (combo, description, callback, action, allowIn, persistent) {
+
+	        // used to save original callback for "allowIn" wrapping:
+	        var _callback;
+
+	        // these elements are prevented by the default Mousetrap.stopCallback():
+	        var preventIn = ['INPUT', 'SELECT', 'TEXTAREA'];
+
+	        // Determine if object format was given:
+	        var objType = Object.prototype.toString.call(combo);
+
+	        if (objType === '[object Object]') {
+	          description = combo.description;
+	          callback    = combo.callback;
+	          action      = combo.action;
+	          persistent  = combo.persistent;
+	          allowIn     = combo.allowIn;
+	          combo       = combo.combo;
+	        }
+
+	        // description is optional:
+	        if (description instanceof Function) {
+	          action = callback;
+	          callback = description;
+	          description = '$$undefined$$';
+	        } else if (angular.isUndefined(description)) {
+	          description = '$$undefined$$';
+	        }
+
+	        // any items added through the public API are for controllers
+	        // that persist through navigation, and thus undefined should mean
+	        // true in this case.
+	        if (persistent === undefined) {
+	          persistent = true;
+	        }
+	        // if callback is defined, then wrap it in a function
+	        // that checks if the event originated from a form element.
+	        // the function blocks the callback from executing unless the element is specified
+	        // in allowIn (emulates Mousetrap.stopCallback() on a per-key level)
+	        if (typeof callback === 'function') {
+
+	          // save the original callback
+	          _callback = callback;
+
+	          // make sure allowIn is an array
+	          if (!(allowIn instanceof Array)) {
+	            allowIn = [];
+	          }
+
+	          // remove anything from preventIn that's present in allowIn
+	          var index;
+	          for (var i=0; i < allowIn.length; i++) {
+	            allowIn[i] = allowIn[i].toUpperCase();
+	            index = preventIn.indexOf(allowIn[i]);
+	            if (index !== -1) {
+	              preventIn.splice(index, 1);
+	            }
+	          }
+
+	          // create the new wrapper callback
+	          callback = function(event) {
+	            var shouldExecute = true;
+	            var target = event.target || event.srcElement; // srcElement is IE only
+	            var nodeName = target.nodeName.toUpperCase();
+
+	            // check if the input has a mousetrap class, and skip checking preventIn if so
+	            if ((' ' + target.className + ' ').indexOf(' mousetrap ') > -1) {
+	              shouldExecute = true;
+	            } else {
+	              // don't execute callback if the event was fired from inside an element listed in preventIn
+	              for (var i=0; i<preventIn.length; i++) {
+	                if (preventIn[i] === nodeName) {
+	                  shouldExecute = false;
+	                  break;
+	                }
+	              }
+	            }
+
+	            if (shouldExecute) {
+	              wrapApply(_callback.apply(this, arguments));
+	            }
+	          };
+	        }
+
+	        if (typeof(action) === 'string') {
+	          Mousetrap.bind(combo, wrapApply(callback), action);
+	        } else {
+	          Mousetrap.bind(combo, wrapApply(callback));
+	        }
+
+	        var hotkey = new Hotkey(combo, description, callback, action, allowIn, persistent);
+	        scope.hotkeys.push(hotkey);
+	        return hotkey;
+	      }
+
+	      /**
+	       * delete and unbind a Hotkey
+	       *
+	       * @param  {mixed} hotkey   Either the bound key or an instance of Hotkey
+	       * @return {boolean}        true if successful
+	       */
+	      function _del (hotkey) {
+	        var combo = (hotkey instanceof Hotkey) ? hotkey.combo : hotkey;
+
+	        Mousetrap.unbind(combo);
+
+	        if (angular.isArray(combo)) {
+	          var retStatus = true;
+	          var i = combo.length;
+	          while (i--) {
+	            retStatus = _del(combo[i]) && retStatus;
+	          }
+	          return retStatus;
+	        } else {
+	          var index = scope.hotkeys.indexOf(_get(combo));
+
+	          if (index > -1) {
+	            // if the combo has other combos bound, don't unbind the whole thing, just the one combo:
+	            if (scope.hotkeys[index].combo.length > 1) {
+	              scope.hotkeys[index].combo.splice(scope.hotkeys[index].combo.indexOf(combo), 1);
+	            } else {
+	              scope.hotkeys.splice(index, 1);
+	            }
+	            return true;
+	          }
+	        }
+
+	        return false;
+
+	      }
+
+	      /**
+	       * Get a Hotkey object by key binding
+	       *
+	       * @param  {[string]} [combo]  the key the Hotkey is bound to. Returns all key bindings if no key is passed
+	       * @return {Hotkey}          The Hotkey object
+	       */
+	      function _get (combo) {
+
+	        if (!combo) {
+	          return scope.hotkeys;
+	        }
+
+	        var hotkey;
+
+	        for (var i = 0; i < scope.hotkeys.length; i++) {
+	          hotkey = scope.hotkeys[i];
+
+	          if (hotkey.combo.indexOf(combo) > -1) {
+	            return hotkey;
+	          }
+	        }
+
+	        return false;
+	      }
+
+	      /**
+	       * Binds the hotkey to a particular scope.  Useful if the scope is
+	       * destroyed, we can automatically destroy the hotkey binding.
+	       *
+	       * @param  {Object} scope The scope to bind to
+	       */
+	      function bindTo (scope) {
+	        // Only initialize once to allow multiple calls for same scope.
+	        if (!(scope.$id in boundScopes)) {
+
+	          // Add the scope to the list of bound scopes
+	          boundScopes[scope.$id] = [];
+
+	          scope.$on('$destroy', function () {
+	            var i = boundScopes[scope.$id].length;
+	            while (i--) {
+	              _del(boundScopes[scope.$id].pop());
+	            }
+	          });
+	        }
+	        // return an object with an add function so we can keep track of the
+	        // hotkeys and their scope that we added via this chaining method
+	        return {
+	          add: function (args) {
+	            var hotkey;
+
+	            if (arguments.length > 1) {
+	              hotkey = _add.apply(this, arguments);
+	            } else {
+	              hotkey = _add(args);
+	            }
+
+	            boundScopes[scope.$id].push(hotkey);
+	            return this;
+	          }
+	        };
+	      }
+
+	      /**
+	       * All callbacks sent to Mousetrap are wrapped using this function
+	       * so that we can force a $scope.$apply()
+	       *
+	       * @param  {Function} callback [description]
+	       * @return {[type]}            [description]
+	       */
+	      function wrapApply (callback) {
+	        // return mousetrap a function to call
+	        return function (event, combo) {
+
+	          // if this is an array, it means we provided a route object
+	          // because the scope wasn't available yet, so rewrap the callback
+	          // now that the scope is available:
+	          if (callback instanceof Array) {
+	            var funcString = callback[0];
+	            var route = callback[1];
+	            callback = function (event) {
+	              route.scope.$eval(funcString);
+	            };
+	          }
+
+	          // this takes place outside angular, so we'll have to call
+	          // $apply() to make sure angular's digest happens
+	          $rootScope.$apply(function() {
+	            // call the original hotkey callback with the keyboard event
+	            callback(event, _get(combo));
+	          });
+	        };
+	      }
+
+
+	      var publicApi = {
+	        add                   : _add,
+	        del                   : _del,
+	        get                   : _get,
+	        bindTo                : bindTo,
+	        template              : this.template,
+	        toggleCheatSheet      : toggleCheatSheet,
+	        includeCheatSheet     : this.includeCheatSheet,
+	        cheatSheetHotkey      : this.cheatSheetHotkey,
+	        cheatSheetDescription : this.cheatSheetDescription,
+	        useNgRoute            : this.useNgRoute,
+	        purgeHotkeys          : purgeHotkeys,
+	        templateTitle         : this.templateTitle
+	      };
+
+	      return publicApi;
+
+	    }];
+
+
+	  }])
+
+	  .directive('hotkey', ['hotkeys', function (hotkeys) {
+	    return {
+	      restrict: 'A',
+	      link: function (scope, el, attrs) {
+	        var key, allowIn;
+
+	        angular.forEach(scope.$eval(attrs.hotkey), function (func, hotkey) {
+	          // split and trim the hotkeys string into array
+	          allowIn = typeof attrs.hotkeyAllowIn === "string" ? attrs.hotkeyAllowIn.split(/[\s,]+/) : [];
+
+	          key = hotkey;
+
+	          hotkeys.add({
+	            combo: hotkey,
+	            description: attrs.hotkeyDescription,
+	            callback: func,
+	            action: attrs.hotkeyAction,
+	            allowIn: allowIn
+	          });
+	        });
+
+	        // remove the hotkey if the directive is destroyed:
+	        el.bind('$destroy', function() {
+	          hotkeys.del(key);
+	        });
+	      }
+	    };
+	  }])
+
+	  .run(['hotkeys', function(hotkeys) {
+	    // force hotkeys to run by injecting it. Without this, hotkeys only runs
+	    // when a controller or something else asks for it via DI.
+	  }]);
+
+	})();
+
+	/*global define:false */
+	/**
+	 * Copyright 2015 Craig Campbell
+	 *
+	 * Licensed under the Apache License, Version 2.0 (the "License");
+	 * you may not use this file except in compliance with the License.
+	 * You may obtain a copy of the License at
+	 *
+	 * http://www.apache.org/licenses/LICENSE-2.0
+	 *
+	 * Unless required by applicable law or agreed to in writing, software
+	 * distributed under the License is distributed on an "AS IS" BASIS,
+	 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	 * See the License for the specific language governing permissions and
+	 * limitations under the License.
+	 *
+	 * Mousetrap is a simple keyboard shortcut library for Javascript with
+	 * no external dependencies
+	 *
+	 * @version 1.5.2
+	 * @url craig.is/killing/mice
+	 */
+	(function(window, document, undefined) {
+
+	    /**
+	     * mapping of special keycodes to their corresponding keys
+	     *
+	     * everything in this dictionary cannot use keypress events
+	     * so it has to be here to map to the correct keycodes for
+	     * keyup/keydown events
+	     *
+	     * @type {Object}
+	     */
+	    var _MAP = {
+	        8: 'backspace',
+	        9: 'tab',
+	        13: 'enter',
+	        16: 'shift',
+	        17: 'ctrl',
+	        18: 'alt',
+	        20: 'capslock',
+	        27: 'esc',
+	        32: 'space',
+	        33: 'pageup',
+	        34: 'pagedown',
+	        35: 'end',
+	        36: 'home',
+	        37: 'left',
+	        38: 'up',
+	        39: 'right',
+	        40: 'down',
+	        45: 'ins',
+	        46: 'del',
+	        91: 'meta',
+	        93: 'meta',
+	        224: 'meta'
+	    };
+
+	    /**
+	     * mapping for special characters so they can support
+	     *
+	     * this dictionary is only used incase you want to bind a
+	     * keyup or keydown event to one of these keys
+	     *
+	     * @type {Object}
+	     */
+	    var _KEYCODE_MAP = {
+	        106: '*',
+	        107: '+',
+	        109: '-',
+	        110: '.',
+	        111 : '/',
+	        186: ';',
+	        187: '=',
+	        188: ',',
+	        189: '-',
+	        190: '.',
+	        191: '/',
+	        192: '`',
+	        219: '[',
+	        220: '\\',
+	        221: ']',
+	        222: '\''
+	    };
+
+	    /**
+	     * this is a mapping of keys that require shift on a US keypad
+	     * back to the non shift equivelents
+	     *
+	     * this is so you can use keyup events with these keys
+	     *
+	     * note that this will only work reliably on US keyboards
+	     *
+	     * @type {Object}
+	     */
+	    var _SHIFT_MAP = {
+	        '~': '`',
+	        '!': '1',
+	        '@': '2',
+	        '#': '3',
+	        '$': '4',
+	        '%': '5',
+	        '^': '6',
+	        '&': '7',
+	        '*': '8',
+	        '(': '9',
+	        ')': '0',
+	        '_': '-',
+	        '+': '=',
+	        ':': ';',
+	        '\"': '\'',
+	        '<': ',',
+	        '>': '.',
+	        '?': '/',
+	        '|': '\\'
+	    };
+
+	    /**
+	     * this is a list of special strings you can use to map
+	     * to modifier keys when you specify your keyboard shortcuts
+	     *
+	     * @type {Object}
+	     */
+	    var _SPECIAL_ALIASES = {
+	        'option': 'alt',
+	        'command': 'meta',
+	        'return': 'enter',
+	        'escape': 'esc',
+	        'plus': '+',
+	        'mod': /Mac|iPod|iPhone|iPad/.test(navigator.platform) ? 'meta' : 'ctrl'
+	    };
+
+	    /**
+	     * variable to store the flipped version of _MAP from above
+	     * needed to check if we should use keypress or not when no action
+	     * is specified
+	     *
+	     * @type {Object|undefined}
+	     */
+	    var _REVERSE_MAP;
+
+	    /**
+	     * loop through the f keys, f1 to f19 and add them to the map
+	     * programatically
+	     */
+	    for (var i = 1; i < 20; ++i) {
+	        _MAP[111 + i] = 'f' + i;
+	    }
+
+	    /**
+	     * loop through to map numbers on the numeric keypad
+	     */
+	    for (i = 0; i <= 9; ++i) {
+	        _MAP[i + 96] = i;
+	    }
+
+	    /**
+	     * cross browser add event method
+	     *
+	     * @param {Element|HTMLDocument} object
+	     * @param {string} type
+	     * @param {Function} callback
+	     * @returns void
+	     */
+	    function _addEvent(object, type, callback) {
+	        if (object.addEventListener) {
+	            object.addEventListener(type, callback, false);
+	            return;
+	        }
+
+	        object.attachEvent('on' + type, callback);
+	    }
+
+	    /**
+	     * takes the event and returns the key character
+	     *
+	     * @param {Event} e
+	     * @return {string}
+	     */
+	    function _characterFromEvent(e) {
+
+	        // for keypress events we should return the character as is
+	        if (e.type == 'keypress') {
+	            var character = String.fromCharCode(e.which);
+
+	            // if the shift key is not pressed then it is safe to assume
+	            // that we want the character to be lowercase.  this means if
+	            // you accidentally have caps lock on then your key bindings
+	            // will continue to work
+	            //
+	            // the only side effect that might not be desired is if you
+	            // bind something like 'A' cause you want to trigger an
+	            // event when capital A is pressed caps lock will no longer
+	            // trigger the event.  shift+a will though.
+	            if (!e.shiftKey) {
+	                character = character.toLowerCase();
+	            }
+
+	            return character;
+	        }
+
+	        // for non keypress events the special maps are needed
+	        if (_MAP[e.which]) {
+	            return _MAP[e.which];
+	        }
+
+	        if (_KEYCODE_MAP[e.which]) {
+	            return _KEYCODE_MAP[e.which];
+	        }
+
+	        // if it is not in the special map
+
+	        // with keydown and keyup events the character seems to always
+	        // come in as an uppercase character whether you are pressing shift
+	        // or not.  we should make sure it is always lowercase for comparisons
+	        return String.fromCharCode(e.which).toLowerCase();
+	    }
+
+	    /**
+	     * checks if two arrays are equal
+	     *
+	     * @param {Array} modifiers1
+	     * @param {Array} modifiers2
+	     * @returns {boolean}
+	     */
+	    function _modifiersMatch(modifiers1, modifiers2) {
+	        return modifiers1.sort().join(',') === modifiers2.sort().join(',');
+	    }
+
+	    /**
+	     * takes a key event and figures out what the modifiers are
+	     *
+	     * @param {Event} e
+	     * @returns {Array}
+	     */
+	    function _eventModifiers(e) {
+	        var modifiers = [];
+
+	        if (e.shiftKey) {
+	            modifiers.push('shift');
+	        }
+
+	        if (e.altKey) {
+	            modifiers.push('alt');
+	        }
+
+	        if (e.ctrlKey) {
+	            modifiers.push('ctrl');
+	        }
+
+	        if (e.metaKey) {
+	            modifiers.push('meta');
+	        }
+
+	        return modifiers;
+	    }
+
+	    /**
+	     * prevents default for this event
+	     *
+	     * @param {Event} e
+	     * @returns void
+	     */
+	    function _preventDefault(e) {
+	        if (e.preventDefault) {
+	            e.preventDefault();
+	            return;
+	        }
+
+	        e.returnValue = false;
+	    }
+
+	    /**
+	     * stops propogation for this event
+	     *
+	     * @param {Event} e
+	     * @returns void
+	     */
+	    function _stopPropagation(e) {
+	        if (e.stopPropagation) {
+	            e.stopPropagation();
+	            return;
+	        }
+
+	        e.cancelBubble = true;
+	    }
+
+	    /**
+	     * determines if the keycode specified is a modifier key or not
+	     *
+	     * @param {string} key
+	     * @returns {boolean}
+	     */
+	    function _isModifier(key) {
+	        return key == 'shift' || key == 'ctrl' || key == 'alt' || key == 'meta';
+	    }
+
+	    /**
+	     * reverses the map lookup so that we can look for specific keys
+	     * to see what can and can't use keypress
+	     *
+	     * @return {Object}
+	     */
+	    function _getReverseMap() {
+	        if (!_REVERSE_MAP) {
+	            _REVERSE_MAP = {};
+	            for (var key in _MAP) {
+
+	                // pull out the numeric keypad from here cause keypress should
+	                // be able to detect the keys from the character
+	                if (key > 95 && key < 112) {
+	                    continue;
+	                }
+
+	                if (_MAP.hasOwnProperty(key)) {
+	                    _REVERSE_MAP[_MAP[key]] = key;
+	                }
+	            }
+	        }
+	        return _REVERSE_MAP;
+	    }
+
+	    /**
+	     * picks the best action based on the key combination
+	     *
+	     * @param {string} key - character for key
+	     * @param {Array} modifiers
+	     * @param {string=} action passed in
+	     */
+	    function _pickBestAction(key, modifiers, action) {
+
+	        // if no action was picked in we should try to pick the one
+	        // that we think would work best for this key
+	        if (!action) {
+	            action = _getReverseMap()[key] ? 'keydown' : 'keypress';
+	        }
+
+	        // modifier keys don't work as expected with keypress,
+	        // switch to keydown
+	        if (action == 'keypress' && modifiers.length) {
+	            action = 'keydown';
+	        }
+
+	        return action;
+	    }
+
+	    /**
+	     * Converts from a string key combination to an array
+	     *
+	     * @param  {string} combination like "command+shift+l"
+	     * @return {Array}
+	     */
+	    function _keysFromString(combination) {
+	        if (combination === '+') {
+	            return ['+'];
+	        }
+
+	        combination = combination.replace(/\+{2}/g, '+plus');
+	        return combination.split('+');
+	    }
+
+	    /**
+	     * Gets info for a specific key combination
+	     *
+	     * @param  {string} combination key combination ("command+s" or "a" or "*")
+	     * @param  {string=} action
+	     * @returns {Object}
+	     */
+	    function _getKeyInfo(combination, action) {
+	        var keys;
+	        var key;
+	        var i;
+	        var modifiers = [];
+
+	        // take the keys from this pattern and figure out what the actual
+	        // pattern is all about
+	        keys = _keysFromString(combination);
+
+	        for (i = 0; i < keys.length; ++i) {
+	            key = keys[i];
+
+	            // normalize key names
+	            if (_SPECIAL_ALIASES[key]) {
+	                key = _SPECIAL_ALIASES[key];
+	            }
+
+	            // if this is not a keypress event then we should
+	            // be smart about using shift keys
+	            // this will only work for US keyboards however
+	            if (action && action != 'keypress' && _SHIFT_MAP[key]) {
+	                key = _SHIFT_MAP[key];
+	                modifiers.push('shift');
+	            }
+
+	            // if this key is a modifier then add it to the list of modifiers
+	            if (_isModifier(key)) {
+	                modifiers.push(key);
+	            }
+	        }
+
+	        // depending on what the key combination is
+	        // we will try to pick the best event for it
+	        action = _pickBestAction(key, modifiers, action);
+
+	        return {
+	            key: key,
+	            modifiers: modifiers,
+	            action: action
+	        };
+	    }
+
+	    function _belongsTo(element, ancestor) {
+	        if (element === document) {
+	            return false;
+	        }
+
+	        if (element === ancestor) {
+	            return true;
+	        }
+
+	        return _belongsTo(element.parentNode, ancestor);
+	    }
+
+	    function Mousetrap(targetElement) {
+	        var self = this;
+
+	        targetElement = targetElement || document;
+
+	        if (!(self instanceof Mousetrap)) {
+	            return new Mousetrap(targetElement);
+	        }
+
+	        /**
+	         * element to attach key events to
+	         *
+	         * @type {Element}
+	         */
+	        self.target = targetElement;
+
+	        /**
+	         * a list of all the callbacks setup via Mousetrap.bind()
+	         *
+	         * @type {Object}
+	         */
+	        self._callbacks = {};
+
+	        /**
+	         * direct map of string combinations to callbacks used for trigger()
+	         *
+	         * @type {Object}
+	         */
+	        self._directMap = {};
+
+	        /**
+	         * keeps track of what level each sequence is at since multiple
+	         * sequences can start out with the same sequence
+	         *
+	         * @type {Object}
+	         */
+	        var _sequenceLevels = {};
+
+	        /**
+	         * variable to store the setTimeout call
+	         *
+	         * @type {null|number}
+	         */
+	        var _resetTimer;
+
+	        /**
+	         * temporary state where we will ignore the next keyup
+	         *
+	         * @type {boolean|string}
+	         */
+	        var _ignoreNextKeyup = false;
+
+	        /**
+	         * temporary state where we will ignore the next keypress
+	         *
+	         * @type {boolean}
+	         */
+	        var _ignoreNextKeypress = false;
+
+	        /**
+	         * are we currently inside of a sequence?
+	         * type of action ("keyup" or "keydown" or "keypress") or false
+	         *
+	         * @type {boolean|string}
+	         */
+	        var _nextExpectedAction = false;
+
+	        /**
+	         * resets all sequence counters except for the ones passed in
+	         *
+	         * @param {Object} doNotReset
+	         * @returns void
+	         */
+	        function _resetSequences(doNotReset) {
+	            doNotReset = doNotReset || {};
+
+	            var activeSequences = false,
+	                key;
+
+	            for (key in _sequenceLevels) {
+	                if (doNotReset[key]) {
+	                    activeSequences = true;
+	                    continue;
+	                }
+	                _sequenceLevels[key] = 0;
+	            }
+
+	            if (!activeSequences) {
+	                _nextExpectedAction = false;
+	            }
+	        }
+
+	        /**
+	         * finds all callbacks that match based on the keycode, modifiers,
+	         * and action
+	         *
+	         * @param {string} character
+	         * @param {Array} modifiers
+	         * @param {Event|Object} e
+	         * @param {string=} sequenceName - name of the sequence we are looking for
+	         * @param {string=} combination
+	         * @param {number=} level
+	         * @returns {Array}
+	         */
+	        function _getMatches(character, modifiers, e, sequenceName, combination, level) {
+	            var i;
+	            var callback;
+	            var matches = [];
+	            var action = e.type;
+
+	            // if there are no events related to this keycode
+	            if (!self._callbacks[character]) {
+	                return [];
+	            }
+
+	            // if a modifier key is coming up on its own we should allow it
+	            if (action == 'keyup' && _isModifier(character)) {
+	                modifiers = [character];
+	            }
+
+	            // loop through all callbacks for the key that was pressed
+	            // and see if any of them match
+	            for (i = 0; i < self._callbacks[character].length; ++i) {
+	                callback = self._callbacks[character][i];
+
+	                // if a sequence name is not specified, but this is a sequence at
+	                // the wrong level then move onto the next match
+	                if (!sequenceName && callback.seq && _sequenceLevels[callback.seq] != callback.level) {
+	                    continue;
+	                }
+
+	                // if the action we are looking for doesn't match the action we got
+	                // then we should keep going
+	                if (action != callback.action) {
+	                    continue;
+	                }
+
+	                // if this is a keypress event and the meta key and control key
+	                // are not pressed that means that we need to only look at the
+	                // character, otherwise check the modifiers as well
+	                //
+	                // chrome will not fire a keypress if meta or control is down
+	                // safari will fire a keypress if meta or meta+shift is down
+	                // firefox will fire a keypress if meta or control is down
+	                if ((action == 'keypress' && !e.metaKey && !e.ctrlKey) || _modifiersMatch(modifiers, callback.modifiers)) {
+
+	                    // when you bind a combination or sequence a second time it
+	                    // should overwrite the first one.  if a sequenceName or
+	                    // combination is specified in this call it does just that
+	                    //
+	                    // @todo make deleting its own method?
+	                    var deleteCombo = !sequenceName && callback.combo == combination;
+	                    var deleteSequence = sequenceName && callback.seq == sequenceName && callback.level == level;
+	                    if (deleteCombo || deleteSequence) {
+	                        self._callbacks[character].splice(i, 1);
+	                    }
+
+	                    matches.push(callback);
+	                }
+	            }
+
+	            return matches;
+	        }
+
+	        /**
+	         * actually calls the callback function
+	         *
+	         * if your callback function returns false this will use the jquery
+	         * convention - prevent default and stop propogation on the event
+	         *
+	         * @param {Function} callback
+	         * @param {Event} e
+	         * @returns void
+	         */
+	        function _fireCallback(callback, e, combo, sequence) {
+
+	            // if this event should not happen stop here
+	            if (self.stopCallback(e, e.target || e.srcElement, combo, sequence)) {
+	                return;
+	            }
+
+	            if (callback(e, combo) === false) {
+	                _preventDefault(e);
+	                _stopPropagation(e);
+	            }
+	        }
+
+	        /**
+	         * handles a character key event
+	         *
+	         * @param {string} character
+	         * @param {Array} modifiers
+	         * @param {Event} e
+	         * @returns void
+	         */
+	        self._handleKey = function(character, modifiers, e) {
+	            var callbacks = _getMatches(character, modifiers, e);
+	            var i;
+	            var doNotReset = {};
+	            var maxLevel = 0;
+	            var processedSequenceCallback = false;
+
+	            // Calculate the maxLevel for sequences so we can only execute the longest callback sequence
+	            for (i = 0; i < callbacks.length; ++i) {
+	                if (callbacks[i].seq) {
+	                    maxLevel = Math.max(maxLevel, callbacks[i].level);
+	                }
+	            }
+
+	            // loop through matching callbacks for this key event
+	            for (i = 0; i < callbacks.length; ++i) {
+
+	                // fire for all sequence callbacks
+	                // this is because if for example you have multiple sequences
+	                // bound such as "g i" and "g t" they both need to fire the
+	                // callback for matching g cause otherwise you can only ever
+	                // match the first one
+	                if (callbacks[i].seq) {
+
+	                    // only fire callbacks for the maxLevel to prevent
+	                    // subsequences from also firing
+	                    //
+	                    // for example 'a option b' should not cause 'option b' to fire
+	                    // even though 'option b' is part of the other sequence
+	                    //
+	                    // any sequences that do not match here will be discarded
+	                    // below by the _resetSequences call
+	                    if (callbacks[i].level != maxLevel) {
+	                        continue;
+	                    }
+
+	                    processedSequenceCallback = true;
+
+	                    // keep a list of which sequences were matches for later
+	                    doNotReset[callbacks[i].seq] = 1;
+	                    _fireCallback(callbacks[i].callback, e, callbacks[i].combo, callbacks[i].seq);
+	                    continue;
+	                }
+
+	                // if there were no sequence matches but we are still here
+	                // that means this is a regular match so we should fire that
+	                if (!processedSequenceCallback) {
+	                    _fireCallback(callbacks[i].callback, e, callbacks[i].combo);
+	                }
+	            }
+
+	            // if the key you pressed matches the type of sequence without
+	            // being a modifier (ie "keyup" or "keypress") then we should
+	            // reset all sequences that were not matched by this event
+	            //
+	            // this is so, for example, if you have the sequence "h a t" and you
+	            // type "h e a r t" it does not match.  in this case the "e" will
+	            // cause the sequence to reset
+	            //
+	            // modifier keys are ignored because you can have a sequence
+	            // that contains modifiers such as "enter ctrl+space" and in most
+	            // cases the modifier key will be pressed before the next key
+	            //
+	            // also if you have a sequence such as "ctrl+b a" then pressing the
+	            // "b" key will trigger a "keypress" and a "keydown"
+	            //
+	            // the "keydown" is expected when there is a modifier, but the
+	            // "keypress" ends up matching the _nextExpectedAction since it occurs
+	            // after and that causes the sequence to reset
+	            //
+	            // we ignore keypresses in a sequence that directly follow a keydown
+	            // for the same character
+	            var ignoreThisKeypress = e.type == 'keypress' && _ignoreNextKeypress;
+	            if (e.type == _nextExpectedAction && !_isModifier(character) && !ignoreThisKeypress) {
+	                _resetSequences(doNotReset);
+	            }
+
+	            _ignoreNextKeypress = processedSequenceCallback && e.type == 'keydown';
+	        };
+
+	        /**
+	         * handles a keydown event
+	         *
+	         * @param {Event} e
+	         * @returns void
+	         */
+	        function _handleKeyEvent(e) {
+
+	            // normalize e.which for key events
+	            // @see http://stackoverflow.com/questions/4285627/javascript-keycode-vs-charcode-utter-confusion
+	            if (typeof e.which !== 'number') {
+	                e.which = e.keyCode;
+	            }
+
+	            var character = _characterFromEvent(e);
+
+	            // no character found then stop
+	            if (!character) {
+	                return;
+	            }
+
+	            // need to use === for the character check because the character can be 0
+	            if (e.type == 'keyup' && _ignoreNextKeyup === character) {
+	                _ignoreNextKeyup = false;
+	                return;
+	            }
+
+	            self.handleKey(character, _eventModifiers(e), e);
+	        }
+
+	        /**
+	         * called to set a 1 second timeout on the specified sequence
+	         *
+	         * this is so after each key press in the sequence you have 1 second
+	         * to press the next key before you have to start over
+	         *
+	         * @returns void
+	         */
+	        function _resetSequenceTimer() {
+	            clearTimeout(_resetTimer);
+	            _resetTimer = setTimeout(_resetSequences, 1000);
+	        }
+
+	        /**
+	         * binds a key sequence to an event
+	         *
+	         * @param {string} combo - combo specified in bind call
+	         * @param {Array} keys
+	         * @param {Function} callback
+	         * @param {string=} action
+	         * @returns void
+	         */
+	        function _bindSequence(combo, keys, callback, action) {
+
+	            // start off by adding a sequence level record for this combination
+	            // and setting the level to 0
+	            _sequenceLevels[combo] = 0;
+
+	            /**
+	             * callback to increase the sequence level for this sequence and reset
+	             * all other sequences that were active
+	             *
+	             * @param {string} nextAction
+	             * @returns {Function}
+	             */
+	            function _increaseSequence(nextAction) {
+	                return function() {
+	                    _nextExpectedAction = nextAction;
+	                    ++_sequenceLevels[combo];
+	                    _resetSequenceTimer();
+	                };
+	            }
+
+	            /**
+	             * wraps the specified callback inside of another function in order
+	             * to reset all sequence counters as soon as this sequence is done
+	             *
+	             * @param {Event} e
+	             * @returns void
+	             */
+	            function _callbackAndReset(e) {
+	                _fireCallback(callback, e, combo);
+
+	                // we should ignore the next key up if the action is key down
+	                // or keypress.  this is so if you finish a sequence and
+	                // release the key the final key will not trigger a keyup
+	                if (action !== 'keyup') {
+	                    _ignoreNextKeyup = _characterFromEvent(e);
+	                }
+
+	                // weird race condition if a sequence ends with the key
+	                // another sequence begins with
+	                setTimeout(_resetSequences, 10);
+	            }
+
+	            // loop through keys one at a time and bind the appropriate callback
+	            // function.  for any key leading up to the final one it should
+	            // increase the sequence. after the final, it should reset all sequences
+	            //
+	            // if an action is specified in the original bind call then that will
+	            // be used throughout.  otherwise we will pass the action that the
+	            // next key in the sequence should match.  this allows a sequence
+	            // to mix and match keypress and keydown events depending on which
+	            // ones are better suited to the key provided
+	            for (var i = 0; i < keys.length; ++i) {
+	                var isFinal = i + 1 === keys.length;
+	                var wrappedCallback = isFinal ? _callbackAndReset : _increaseSequence(action || _getKeyInfo(keys[i + 1]).action);
+	                _bindSingle(keys[i], wrappedCallback, action, combo, i);
+	            }
+	        }
+
+	        /**
+	         * binds a single keyboard combination
+	         *
+	         * @param {string} combination
+	         * @param {Function} callback
+	         * @param {string=} action
+	         * @param {string=} sequenceName - name of sequence if part of sequence
+	         * @param {number=} level - what part of the sequence the command is
+	         * @returns void
+	         */
+	        function _bindSingle(combination, callback, action, sequenceName, level) {
+
+	            // store a direct mapped reference for use with Mousetrap.trigger
+	            self._directMap[combination + ':' + action] = callback;
+
+	            // make sure multiple spaces in a row become a single space
+	            combination = combination.replace(/\s+/g, ' ');
+
+	            var sequence = combination.split(' ');
+	            var info;
+
+	            // if this pattern is a sequence of keys then run through this method
+	            // to reprocess each pattern one key at a time
+	            if (sequence.length > 1) {
+	                _bindSequence(combination, sequence, callback, action);
+	                return;
+	            }
+
+	            info = _getKeyInfo(combination, action);
+
+	            // make sure to initialize array if this is the first time
+	            // a callback is added for this key
+	            self._callbacks[info.key] = self._callbacks[info.key] || [];
+
+	            // remove an existing match if there is one
+	            _getMatches(info.key, info.modifiers, {type: info.action}, sequenceName, combination, level);
+
+	            // add this call back to the array
+	            // if it is a sequence put it at the beginning
+	            // if not put it at the end
+	            //
+	            // this is important because the way these are processed expects
+	            // the sequence ones to come first
+	            self._callbacks[info.key][sequenceName ? 'unshift' : 'push']({
+	                callback: callback,
+	                modifiers: info.modifiers,
+	                action: info.action,
+	                seq: sequenceName,
+	                level: level,
+	                combo: combination
+	            });
+	        }
+
+	        /**
+	         * binds multiple combinations to the same callback
+	         *
+	         * @param {Array} combinations
+	         * @param {Function} callback
+	         * @param {string|undefined} action
+	         * @returns void
+	         */
+	        self._bindMultiple = function(combinations, callback, action) {
+	            for (var i = 0; i < combinations.length; ++i) {
+	                _bindSingle(combinations[i], callback, action);
+	            }
+	        };
+
+	        // start!
+	        _addEvent(targetElement, 'keypress', _handleKeyEvent);
+	        _addEvent(targetElement, 'keydown', _handleKeyEvent);
+	        _addEvent(targetElement, 'keyup', _handleKeyEvent);
+	    }
+
+	    /**
+	     * binds an event to mousetrap
+	     *
+	     * can be a single key, a combination of keys separated with +,
+	     * an array of keys, or a sequence of keys separated by spaces
+	     *
+	     * be sure to list the modifier keys first to make sure that the
+	     * correct key ends up getting bound (the last key in the pattern)
+	     *
+	     * @param {string|Array} keys
+	     * @param {Function} callback
+	     * @param {string=} action - 'keypress', 'keydown', or 'keyup'
+	     * @returns void
+	     */
+	    Mousetrap.prototype.bind = function(keys, callback, action) {
+	        var self = this;
+	        keys = keys instanceof Array ? keys : [keys];
+	        self._bindMultiple.call(self, keys, callback, action);
+	        return self;
+	    };
+
+	    /**
+	     * unbinds an event to mousetrap
+	     *
+	     * the unbinding sets the callback function of the specified key combo
+	     * to an empty function and deletes the corresponding key in the
+	     * _directMap dict.
+	     *
+	     * TODO: actually remove this from the _callbacks dictionary instead
+	     * of binding an empty function
+	     *
+	     * the keycombo+action has to be exactly the same as
+	     * it was defined in the bind method
+	     *
+	     * @param {string|Array} keys
+	     * @param {string} action
+	     * @returns void
+	     */
+	    Mousetrap.prototype.unbind = function(keys, action) {
+	        var self = this;
+	        return self.bind.call(self, keys, function() {}, action);
+	    };
+
+	    /**
+	     * triggers an event that has already been bound
+	     *
+	     * @param {string} keys
+	     * @param {string=} action
+	     * @returns void
+	     */
+	    Mousetrap.prototype.trigger = function(keys, action) {
+	        var self = this;
+	        if (self._directMap[keys + ':' + action]) {
+	            self._directMap[keys + ':' + action]({}, keys);
+	        }
+	        return self;
+	    };
+
+	    /**
+	     * resets the library back to its initial state.  this is useful
+	     * if you want to clear out the current keyboard shortcuts and bind
+	     * new ones - for example if you switch to another page
+	     *
+	     * @returns void
+	     */
+	    Mousetrap.prototype.reset = function() {
+	        var self = this;
+	        self._callbacks = {};
+	        self._directMap = {};
+	        return self;
+	    };
+
+	    /**
+	     * should we stop this event before firing off callbacks
+	     *
+	     * @param {Event} e
+	     * @param {Element} element
+	     * @return {boolean}
+	     */
+	    Mousetrap.prototype.stopCallback = function(e, element) {
+	        var self = this;
+
+	        // if the element has the class "mousetrap" then no need to stop
+	        if ((' ' + element.className + ' ').indexOf(' mousetrap ') > -1) {
+	            return false;
+	        }
+
+	        if (_belongsTo(element, self.target)) {
+	            return false;
+	        }
+
+	        // stop for input, select, and textarea
+	        return element.tagName == 'INPUT' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || element.isContentEditable;
+	    };
+
+	    /**
+	     * exposes _handleKey publicly so it can be overwritten by extensions
+	     */
+	    Mousetrap.prototype.handleKey = function() {
+	        var self = this;
+	        return self._handleKey.apply(self, arguments);
+	    };
+
+	    /**
+	     * Init the global mousetrap functions
+	     *
+	     * This method is needed to allow the global mousetrap functions to work
+	     * now that mousetrap is a constructor function.
+	     */
+	    Mousetrap.init = function() {
+	        var documentMousetrap = Mousetrap(document);
+	        for (var method in documentMousetrap) {
+	            if (method.charAt(0) !== '_') {
+	                Mousetrap[method] = (function(method) {
+	                    return function() {
+	                        return documentMousetrap[method].apply(documentMousetrap, arguments);
+	                    };
+	                } (method));
+	            }
+	        }
+	    };
+
+	    Mousetrap.init();
+
+	    // expose mousetrap to the global object
+	    window.Mousetrap = Mousetrap;
+
+	    // expose as a common js module
+	    if (typeof module !== 'undefined' && module.exports) {
+	        module.exports = Mousetrap;
+	    }
+
+	    // expose mousetrap as an AMD module
+	    if (true) {
+	        !(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
+	            return Mousetrap;
+	        }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	    }
+	}) (window, document);
+
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(12);
+	var content = __webpack_require__(13);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(14)(content, {});
+	var update = __webpack_require__(15)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -54971,23 +56613,23 @@
 	}
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(13)();
+	exports = module.exports = __webpack_require__(14)();
 	// imports
 	exports.push([module.id, "@import url(https://fonts.googleapis.com/icon?family=Material+Icons);", ""]);
 	exports.push([module.id, "@import url(https://ajax.googleapis.com/ajax/libs/angular_material/0.10.1/angular-material.min.css);", ""]);
 	exports.push([module.id, "@import url(https://fonts.googleapis.com/css?family=RobotoDraft:300,400,500,700,400italic);", ""]);
 
 	// module
-	exports.push([module.id, "p {\n  margin-bottom: 1em; }\n\n.heading {\n  margin-bottom: 0.618em; }\n  .heading.-large, h1 {\n    font-size: 24px;\n    font-weight: bold;\n    line-height: 30px; }\n  .heading.-medium, h2 {\n    font-size: 16px;\n    font-weight: normal;\n    line-height: 20px; }\n  .heading.-small, h3 {\n    font-size: 12px;\n    font-weight: bold;\n    line-height: 13.33333px; }\n  .heading.-smallest {\n    font-size: 10px;\n    font-weight: bold; }\n\nbody {\n  color: #333;\n  background-color: #eee;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-align-items: stretch;\n      -ms-flex-align: stretch;\n          align-items: stretch;\n  -webkit-justify-content: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  overflow: hidden; }\n\n#app {\n  margin: 20px;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-direction: column;\n      -ms-flex-direction: column;\n          flex-direction: column;\n  background-color: #fff;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1; }\n\n.main {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  overflow-y: auto; }\n\n.browser {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1; }\n\n.player {\n  position: relative;\n  z-index: 1; }\n\n.player__content {\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center; }\n\n.player__left {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1; }\n\n.player__right {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1; }\n\n.track-desc {\n  font-weight: bold; }\n\nprogress-bar {\n  display: block;\n  position: relative;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  height: 5px;\n  background-color: pink; }\n\n.slider {\n  position: absolute;\n  width: 100%;\n  z-index: 1;\n  top: -24px;\n  margin-left: 0;\n  margin-right: 0; }\n\n.now-playing {\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  background-color: white;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center; }\n\n.now-playing__content {\n  padding: 20px; }\n\n.now-playing__artist {\n  display: block; }\n\n.now-playing__track {\n  display: block;\n  font-size: 14px; }\n\nmd-icon {\n  height: initial;\n  width: initial; }\n\nmd-icon .material-icons {\n  display: block !important; }\n\n.material-icons.md-18 {\n  font-size: 18px; }\n\n.material-icons.md-24 {\n  font-size: 24px; }\n\n.material-icons.md-36 {\n  font-size: 36px; }\n\n.material-icons.md-48 {\n  font-size: 48px; }\n\n.material-icons.md-dark {\n  color: rgba(0, 0, 0, 0.54); }\n\n.material-icons.md-dark.md-inactive {\n  color: rgba(0, 0, 0, 0.26); }\n\n.material-icons.md-light {\n  color: white; }\n\n.material-icons.md-light.md-inactive {\n  color: rgba(255, 255, 255, 0.3); }\n", ""]);
+	exports.push([module.id, "p {\n  margin-bottom: 1em; }\n\n.heading {\n  margin-bottom: 0.618em; }\n  .heading.-large, h1 {\n    font-size: 24px;\n    font-weight: bold;\n    line-height: 30px; }\n  .heading.-medium, h2 {\n    font-size: 16px;\n    font-weight: normal;\n    line-height: 20px; }\n  .heading.-small, h3 {\n    font-size: 12px;\n    font-weight: bold;\n    line-height: 13.33333px; }\n  .heading.-smallest {\n    font-size: 10px;\n    font-weight: bold; }\n\nbody {\n  color: #333;\n  background-color: #eee;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-align-items: stretch;\n      -ms-flex-align: stretch;\n          align-items: stretch;\n  -webkit-justify-content: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  overflow: hidden; }\n\n#app {\n  margin: 0;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-direction: column;\n      -ms-flex-direction: column;\n          flex-direction: column;\n  background-color: #fff;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1; }\n  @media (min-width: 768px) {\n    #app {\n      margin: 20px; } }\n\n.container,\nplaylist-container,\nplaylists-container {\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-direction: column;\n      -ms-flex-direction: column;\n          flex-direction: column;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  overflow: hidden; }\n\nplaylists-container md-input-container {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  padding: 2px; }\n  playlists-container md-input-container:not(.md-input-invalid) > md-icon.search {\n    color: #fff; }\n  playlists-container md-input-container .md-input {\n    color: #fff; }\n\nsearch-results md-divider {\n  margin-top: 10px;\n  margin-bottom: 10px; }\n\n.main {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  overflow-y: auto; }\n\n.browser {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1; }\n\n.player {\n  position: relative;\n  z-index: 1;\n  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2); }\n\n.player__content {\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center; }\n\n.player__left {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1; }\n\n.player__right {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1; }\n\n.track-desc {\n  font-weight: bold; }\n\nprogress-bar {\n  display: block;\n  position: relative;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  height: 5px;\n  background-color: pink; }\n\n.slider {\n  position: absolute;\n  width: 100%;\n  z-index: 1;\n  top: -24px;\n  margin-left: 0;\n  margin-right: 0; }\n\n.now-playing {\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  background-color: white;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center; }\n\n.now-playing__content {\n  padding: 20px; }\n\n.now-playing__artist {\n  display: block; }\n\n.now-playing__track {\n  display: block;\n  font-size: 14px; }\n\nmd-icon {\n  height: initial;\n  width: initial; }\n\nmd-icon .material-icons {\n  display: block !important; }\n\n.material-icons.md-18 {\n  font-size: 18px; }\n\n.material-icons.md-24 {\n  font-size: 24px; }\n\n.material-icons.md-36 {\n  font-size: 36px; }\n\n.material-icons.md-48 {\n  font-size: 48px; }\n\n.material-icons.md-dark {\n  color: rgba(0, 0, 0, 0.54); }\n\n.material-icons.md-dark.md-inactive {\n  color: rgba(0, 0, 0, 0.26); }\n\n.material-icons.md-light {\n  color: white; }\n\n.material-icons.md-light.md-inactive {\n  color: rgba(255, 255, 255, 0.3); }\n", ""]);
 
 	// exports
 
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports) {
 
 	/*
@@ -55043,7 +56685,7 @@
 
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -55268,23 +56910,35 @@
 
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports) {
 
 	'use strict';
+
+	var mopidyHost = '192.168.1.103:6680';
+	var hostname = window.location.hostname;
+	var host = window.location.host;
+
+	var appUrl = isLocal() ? 'http://' + host : mopidyHost + '/material';
+	var mopidyUrl = isLocal() ? '127.0.0.1:6680' : mopidyHost;
+	console.log(appUrl, mopidyUrl);
 
 	var AppSettings = {
 	  appTitle: 'Mopidy',
 	  starredPlaylistId: '45AW0U4mHoXBA7GEKeE5Jq',
 	  spotifyClientId: '453d62ba1a244e8780eb53e3fcc4ccac',
-	  appUrl: 'http://192.168.1.103:6680/material',
-	  mopidyServer: '192.168.1.103:6680'
+	  appUrl: appUrl,
+	  mopidyServer: mopidyUrl
 	};
+
+	function isLocal() {
+	    return hostname === 'localhost';
+	}
 
 	module.exports = AppSettings;
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -55305,22 +56959,21 @@
 
 
 /***/ },
-/* 17 */
+/* 18 */
 /***/ function(module, exports) {
 
 	'use strict';
 
 	function States($urlRouterProvider, $stateProvider) {
 
-	    $urlRouterProvider.otherwise('/')
+	    $urlRouterProvider.otherwise('/playlists')
 	    
 
 	    $stateProvider
 	        .state('app', {
 	            url: '',
 	            abstract: true,
-	            title: 'Mopidy',
-	            template: '<toolbar></toolbar><div class="main" ui-view></div><player me="me"></player>',
+	            template: '<ui-view class="container"></ui-view><player me="me"></player>',
 	            controller: AppController,
 	            resolve: {
 	                mopidy: getMopidy,
@@ -55328,19 +56981,33 @@
 	            }
 	        })
 	        .state('app.playlists', {
-	            url: '/',
-	            title: 'Playlists',
-	            template: '<playlists></playlists>'
+	            url: '/playlists',
+	            name: 'Playlists',
+	            views: {
+	                '@app': {
+	                    template: '<playlists-container></playlists-container>'
+	                }
+	            }
 	        })
+	            .state('app.playlists.show', {
+	                url: '/:playlistUri',
+	                name: 'Playlist',
+	                views: {
+	                    '@app': {
+	                        controller: function($scope, $state) {
+	                            $scope.playlistUri = $state.params.playlistUri;
+	                        },
+	                        template: '<playlist-container uri="{{ playlistUri }}"></playlist-container>'
+	                    }
+	                }
+	            })
 	        .state('app.settings', {
 	            url: '/settings',
-	            title: 'Settings',
 	            template: '<settings></settings>'
 	        })
 	        .state('reconnect', {
 	            url: '/reconnect',
-	            title: 'Reconnect',
-	            template: '<h1>Mopidy connection error</h1><a ui-sref="app">reconnect</a>'
+	            template: '<h1>Mopidy connection error</h1><a ui-sref="app.playlists">reconnect</a>'
 	        });
 	}
 
@@ -55382,7 +57049,7 @@
 
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -55415,13 +57082,13 @@
 
 
 /***/ },
-/* 19 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Mopidy = __webpack_require__(20);
-	var _ = __webpack_require__(45);
+	var Mopidy = __webpack_require__(21);
+	var _ = __webpack_require__(46);
 
 	function ConnectMopidy($window, $q, $rootScope, AppSettings) {
 	    var mopidy;
@@ -55477,14 +57144,14 @@
 
 
 /***/ },
-/* 20 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*global module:true, require:false*/
 
-	var bane = __webpack_require__(21);
-	var websocket = __webpack_require__(23);
-	var when = __webpack_require__(24);
+	var bane = __webpack_require__(22);
+	var websocket = __webpack_require__(24);
+	var when = __webpack_require__(25);
 
 	function Mopidy(settings) {
 	    if (!(this instanceof Mopidy)) {
@@ -55818,10 +57485,10 @@
 
 
 /***/ },
-/* 21 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;(("function" === "function" && __webpack_require__(22) && function (m) { !(__WEBPACK_AMD_DEFINE_FACTORY__ = (m), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)); }) ||
+	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;(("function" === "function" && __webpack_require__(23) && function (m) { !(__WEBPACK_AMD_DEFINE_FACTORY__ = (m), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)); }) ||
 	 (typeof module === "object" && function (m) { module.exports = m(); }) ||
 	 function (m) { this.bane = m(); }
 	)(function () {
@@ -55998,7 +57665,7 @@
 
 
 /***/ },
-/* 22 */
+/* 23 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {module.exports = __webpack_amd_options__;
@@ -56006,14 +57673,14 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, {}))
 
 /***/ },
-/* 23 */
+/* 24 */
 /***/ function(module, exports) {
 
 	module.exports = { Client: window.WebSocket };
 
 
 /***/ },
-/* 24 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -56027,24 +57694,24 @@
 	(function(define) { 'use strict';
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 
-		var timed = __webpack_require__(25);
-		var array = __webpack_require__(31);
-		var flow = __webpack_require__(34);
-		var fold = __webpack_require__(35);
-		var inspect = __webpack_require__(36);
-		var generate = __webpack_require__(37);
-		var progress = __webpack_require__(38);
-		var withThis = __webpack_require__(39);
-		var unhandledRejection = __webpack_require__(40);
-		var TimeoutError = __webpack_require__(30);
+		var timed = __webpack_require__(26);
+		var array = __webpack_require__(32);
+		var flow = __webpack_require__(35);
+		var fold = __webpack_require__(36);
+		var inspect = __webpack_require__(37);
+		var generate = __webpack_require__(38);
+		var progress = __webpack_require__(39);
+		var withThis = __webpack_require__(40);
+		var unhandledRejection = __webpack_require__(41);
+		var TimeoutError = __webpack_require__(31);
 
 		var Promise = [array, flow, fold, generate, progress,
 			inspect, withThis, timed, unhandledRejection]
 			.reduce(function(Promise, feature) {
 				return feature(Promise);
-			}, __webpack_require__(42));
+			}, __webpack_require__(43));
 
-		var apply = __webpack_require__(33)(Promise);
+		var apply = __webpack_require__(34)(Promise);
 
 		// Public API
 
@@ -56243,11 +57910,11 @@
 
 		return when;
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	})(__webpack_require__(29));
+	})(__webpack_require__(30));
 
 
 /***/ },
-/* 25 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -56257,8 +57924,8 @@
 	(function(define) { 'use strict';
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
 
-		var env = __webpack_require__(26);
-		var TimeoutError = __webpack_require__(30);
+		var env = __webpack_require__(27);
+		var TimeoutError = __webpack_require__(31);
 
 		function setTimeout(f, ms, x, y) {
 			return env.setTimer(function() {
@@ -56327,11 +57994,11 @@
 		};
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(29)));
+	}(__webpack_require__(30)));
 
 
 /***/ },
-/* 26 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var require;var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(process) {/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -56365,7 +58032,7 @@
 
 		} else if (!capturedSetTimeout) { // vert.x
 			var vertxRequire = require;
-			var vertx = __webpack_require__(28);
+			var vertx = __webpack_require__(29);
 			setTimer = function (f, ms) { return vertx.setTimer(ms, f); };
 			clearTimer = vertx.cancelTimer;
 			asap = vertx.runOnLoop || vertx.runOnContext;
@@ -56406,12 +58073,12 @@
 			};
 		}
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(29)));
+	}(__webpack_require__(30)));
 
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(27)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(28)))
 
 /***/ },
-/* 27 */
+/* 28 */
 /***/ function(module, exports) {
 
 	// shim for using process in browser
@@ -56507,20 +58174,20 @@
 
 
 /***/ },
-/* 28 */
+/* 29 */
 /***/ function(module, exports) {
 
 	/* (ignored) */
 
 /***/ },
-/* 29 */
+/* 30 */
 /***/ function(module, exports) {
 
 	module.exports = function() { throw new Error("define cannot be used indirect"); };
 
 
 /***/ },
-/* 30 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -56549,10 +58216,10 @@
 
 		return TimeoutError;
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(29)));
+	}(__webpack_require__(30)));
 
 /***/ },
-/* 31 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -56562,8 +58229,8 @@
 	(function(define) { 'use strict';
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
 
-		var state = __webpack_require__(32);
-		var applier = __webpack_require__(33);
+		var state = __webpack_require__(33);
+		var applier = __webpack_require__(34);
 
 		return function array(Promise) {
 
@@ -56843,11 +58510,11 @@
 		};
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(29)));
+	}(__webpack_require__(30)));
 
 
 /***/ },
-/* 32 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -56884,11 +58551,11 @@
 		}
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(29)));
+	}(__webpack_require__(30)));
 
 
 /***/ },
-/* 33 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -56943,13 +58610,13 @@
 		}
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(29)));
+	}(__webpack_require__(30)));
 
 
 
 
 /***/ },
-/* 34 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -57111,11 +58778,11 @@
 		}
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(29)));
+	}(__webpack_require__(30)));
 
 
 /***/ },
-/* 35 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -57144,11 +58811,11 @@
 		};
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(29)));
+	}(__webpack_require__(30)));
 
 
 /***/ },
-/* 36 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -57158,7 +58825,7 @@
 	(function(define) { 'use strict';
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
 
-		var inspect = __webpack_require__(32).inspect;
+		var inspect = __webpack_require__(33).inspect;
 
 		return function inspection(Promise) {
 
@@ -57170,11 +58837,11 @@
 		};
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(29)));
+	}(__webpack_require__(30)));
 
 
 /***/ },
-/* 37 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -57241,11 +58908,11 @@
 		};
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(29)));
+	}(__webpack_require__(30)));
 
 
 /***/ },
-/* 38 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -57271,11 +58938,11 @@
 		};
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(29)));
+	}(__webpack_require__(30)));
 
 
 /***/ },
-/* 39 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -57314,12 +58981,12 @@
 		};
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(29)));
+	}(__webpack_require__(30)));
 
 
 
 /***/ },
-/* 40 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -57329,8 +58996,8 @@
 	(function(define) { 'use strict';
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
 
-		var setTimer = __webpack_require__(26).setTimer;
-		var format = __webpack_require__(41);
+		var setTimer = __webpack_require__(27).setTimer;
+		var format = __webpack_require__(42);
 
 		return function unhandledRejection(Promise) {
 
@@ -57407,11 +59074,11 @@
 		function noop() {}
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(29)));
+	}(__webpack_require__(30)));
 
 
 /***/ },
-/* 41 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -57469,11 +59136,11 @@
 		}
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(29)));
+	}(__webpack_require__(30)));
 
 
 /***/ },
-/* 42 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -57483,20 +59150,20 @@
 	(function(define) { 'use strict';
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 
-		var makePromise = __webpack_require__(43);
-		var Scheduler = __webpack_require__(44);
-		var async = __webpack_require__(26).asap;
+		var makePromise = __webpack_require__(44);
+		var Scheduler = __webpack_require__(45);
+		var async = __webpack_require__(27).asap;
 
 		return makePromise({
 			scheduler: new Scheduler(async)
 		});
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	})(__webpack_require__(29));
+	})(__webpack_require__(30));
 
 
 /***/ },
-/* 43 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(process) {/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -58425,12 +60092,12 @@
 			return Promise;
 		};
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(29)));
+	}(__webpack_require__(30)));
 
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(27)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(28)))
 
 /***/ },
-/* 44 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -58512,11 +60179,11 @@
 		return Scheduler;
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(29)));
+	}(__webpack_require__(30)));
 
 
 /***/ },
-/* 45 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {/**
@@ -70871,10 +72538,10 @@
 	  }
 	}.call(this));
 
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(46)(module), (function() { return this; }())))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(47)(module), (function() { return this; }())))
 
 /***/ },
-/* 46 */
+/* 47 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -70890,7 +72557,7 @@
 
 
 /***/ },
-/* 47 */
+/* 48 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -70915,7 +72582,7 @@
 	module.exports = Util;
 
 /***/ },
-/* 48 */
+/* 49 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -70936,14 +72603,14 @@
 
 
 /***/ },
-/* 49 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var template = __webpack_require__(50);
+	var template = __webpack_require__(51);
 
-	function Player($rootScope, $interval, Util, Spotify, AppSettings, Mopidy) {
+	function Player($rootScope, $interval, Util, Spotify, AppSettings, Mopidy, hotkeys) {
 	    return {
 	        restrict: 'E',
 	        templateUrl: template,
@@ -70970,6 +72637,14 @@
 	            $rootScope.$on('mopidy:event:trackPlaybackResumed', handleTrackPlaybackResumed)
 	            $rootScope.$on('mopidy:event:trackPlaybackPaused', handleTrackPlaybackPaused)
 	            $rootScope.$on('mopidy:event:trackPlaybackEnded', handleTrackPlaybackEnded)
+
+	            hotkeys.add({
+	                combo: 'space',
+	                description: 'Pause / Play',
+	                callback: function() {
+	                  $scope.pausePlay();
+	                }
+	              });
 
 	            init()
 
@@ -71147,28 +72822,116 @@
 	module.exports = Player;
 
 /***/ },
-/* 50 */
+/* 51 */
 /***/ function(module, exports) {
 
 	var path = 'player/player.html';
-	window.angular.module('ng').run(['$templateCache', function(c) { c.put(path, "\n    <div class=\"player md-whiteframe-z2\">\n\n        <md-slider class=\"slider\" aria-label=\"slider\" flex min=\"0\" max=\"100\" ng-model=\"currentTimePosition\" step=\"0.1\">\n        </md-slider>\n\n        <div class=\"player__content\">\n            <div class=\"player__left\">\n                <div class=\"now-playing__content\">\n                    <div class=\"now-playing__artist\">{{ track.artists[0].name }}</div>\n                    <div class=\"now-playing__track\">{{ track.name }}</div>\n                </div>\n                \n            </div>\n            <div class=\"player__middle\">\n                <div class=\"\">\n                    <md-button class=\"md-icon-button\" aria-label=\"More\" ng-click=\"star()\" ng-class=\"{\n                        'md-accent': isFavorited()\n                    }\">\n                        <md-icon class=\"material-icons\">favorite</md-icon>\n                    </md-button>\n\n                    <md-button class=\"md-icon-button\" aria-label=\"More\" ng-click=\"previous()\">\n                        <md-icon class=\"material-icons\">skip_previous</md-icon>\n                    </md-button>\n                    <md-button class=\"md-icon-button\" aria-label=\"More\" ng-click=\"pausePlay()\">\n                        <md-icon class=\"material-icons\" ng-class=\"{\n                            'md-48': state !== 'playing'\n                        }\">{{ state === 'playing' ? 'pause' : 'play_circle_filled' }}</md-icon>\n                    </md-button>\n                    <md-button class=\"md-icon-button\" aria-label=\"More\" ng-click=\"next()\">\n                        <md-icon class=\"material-icons\">skip_next</md-icon>\n                    </md-button>\n                </div>\n            </div>\n\n        </div>\n        \n    </div>\n    ") }]);
+	window.angular.module('ng').run(['$templateCache', function(c) { c.put(path, "\n    <div class=\"player md-whiteframe-z2\">\n\n        <md-slider class=\"slider\" aria-label=\"slider\" flex min=\"0\" max=\"100\" ng-model=\"currentTimePosition\" step=\"0.1\">\n        </md-slider>\n\n        <div class=\"player__content\">\n            <div class=\"player__left\">\n                <div class=\"now-playing__content\">\n                    <div class=\"now-playing__artist\">{{ track.artists[0].name }}</div>\n                    <div class=\"now-playing__track\">{{ track.name }}</div>\n                </div>\n                \n            </div>\n            <div class=\"player__middle\">\n                <div class=\"\">\n                    <md-button class=\"md-icon-button\" aria-label=\"More\" ng-click=\"star()\" ng-class=\"{\n                        'md-accent': isFavorited()\n                    }\">\n                        <md-icon class=\"material-icons\">favorite</md-icon>\n                    </md-button>\n\n                    <md-button class=\"md-icon-button\" aria-label=\"More\" ng-click=\"previous()\">\n                        <md-icon class=\"material-icons\">skip_previous</md-icon>\n                    </md-button>\n                    <md-button class=\"md-icon-button md-accent\" aria-label=\"More\" ng-click=\"pausePlay()\">\n                        <md-icon class=\"material-icons md-48\">{{ state === 'playing' ? 'pause_circle_filled' : 'play_circle_filled' }}</md-icon>\n                    </md-button>\n                    <md-button class=\"md-icon-button\" aria-label=\"More\" ng-click=\"next()\">\n                        <md-icon class=\"material-icons\">skip_next</md-icon>\n                    </md-button>\n                </div>\n            </div>\n\n        </div>\n        \n    </div>\n    ") }]);
 	module.exports = path;
 
 /***/ },
-/* 51 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var template = __webpack_require__(52)
+	var template = __webpack_require__(53)
 
-	function Playlists(Mopidy) {
+	function searchResults($state, Mopidy) {
+	    return {
+	        restrict: 'E',
+	        templateUrl: template,
+	        scope: {
+	            results: '='
+	        },
+	        controller: function($scope) {
+	            $scope.addAndPlay = addAndPlay;
+	            $scope.showPlaylist = showPlaylist;
+	            
+	            function addAndPlay (uri) {    
+	                return Mopidy.execute('tracklist.clear')
+	                .then(Mopidy.execute('tracklist.add', {uri: uri}))
+	                .then(Mopidy.execute('tracklist.shuffle'))
+	                .then(Mopidy.execute('playback.play'))
+	            }
+
+	            function showPlaylist (uri) {
+	                return $state.go('.show', {playlistUri: uri});
+	            }
+	        }
+	    }
+	}
+
+	module.exports = searchResults;
+
+/***/ },
+/* 53 */
+/***/ function(module, exports) {
+
+	var path = 'searchResults/searchResults.html';
+	window.angular.module('ng').run(['$templateCache', function(c) { c.put(path, "<md-list>\n    <md-subheader class=\"md-no-sticky\">Artists</md-subheader>\n    <md-list-item class=\"md-with-secondary--hover\" ng-repeat=\"artist in results.artists | limitTo: 3\" ng-click=\"showPlaylist(artist.uri)\">\n        <p>{{ artist.name }}</p>\n        <md-icon class=\"md-secondary material-icons\" ng-click=\"addAndPlay(artist.uri)\">play_arrow</md-icon>\n    </md-list-item>\n    \n    <md-divider></md-divider>\n\n    <md-subheader class=\"md-no-sticky\">Albums</md-subheader>\n    <md-list-item class=\"md-with-secondary--hover\" ng-repeat=\"album in results.albums | limitTo: 3\" ng-click=\"showPlaylist(album.uri)\">\n        <p>{{ album.name }}</p>\n        <md-icon class=\"md-secondary material-icons\" ng-click=\"addAndPlay(album.uri)\">play_arrow</md-icon>\n    </md-list-item>\n\n    <md-divider></md-divider>\n\n    <md-subheader class=\"md-no-sticky\">Tracks</md-subheader>\n    <md-list-item class=\"md-with-secondary--hover\" ng-repeat=\"track in results.tracks | limitTo: 10\" ng-click=\"showPlaylist(track.uri)\">\n        <p>{{ track.name }}</p>\n        <md-icon class=\"md-secondary material-icons\" ng-click=\"addAndPlay(track.uri)\">play_arrow</md-icon>\n    </md-list-item>\n    \n\n</md-list>\n") }]);
+	module.exports = path;
+
+/***/ },
+/* 54 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var template = __webpack_require__(55)
+
+	function PlaylistsContainer($state, Mopidy) {
+	    return {
+	        restrict: 'E',
+	        templateUrl: template,
+	        controller: function($scope) {
+	            $scope.search = search;
+	            $scope.results;
+	            $scope.clearResults = clearResults;
+
+	            function clearResults() {
+	                debugger;
+	                $scope.results = undefined;
+	            }
+
+	            function search(term) {
+	                Mopidy.execute('library.search', {
+	                    any: [term]
+	                })
+	                .then(function(res) {
+	                    $scope.results = res[0];
+	                })
+	            }
+	        }
+	    }
+	}
+
+	module.exports = PlaylistsContainer;
+
+/***/ },
+/* 55 */
+/***/ function(module, exports) {
+
+	var path = 'playlists/container.html';
+	window.angular.module('ng').run(['$templateCache', function(c) { c.put(path, "<playlists-toolbar on-clear-search=\"clearResults()\" on-search=\"search(term)\"></playlists-toolbar>\n<playlists class=\"main\" ng-if=\"!results\"></playlists>\n<search-results class=\"main\" ng-if=\"results\" results=\"results\"></search-results>") }]);
+	module.exports = path;
+
+/***/ },
+/* 56 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var template = __webpack_require__(57)
+
+	function Playlists($state, Mopidy) {
 	    return {
 	        restrict: 'E',
 	        templateUrl: template,
 	        controller: function($scope) {
 	            $scope.playlists = [];
 	            $scope.addAndPlay = addAndPlay;
+	            $scope.showPlaylist = showPlaylist;
 	            
 	            getPlaylists();
 
@@ -71178,13 +72941,15 @@
 	                    $scope.playlists = playlists;
 	                });
 	            }
-	            
-	            
 	            function addAndPlay (uri) {    
 	                return Mopidy.execute('tracklist.clear')
 	                .then(Mopidy.execute('tracklist.add', {uri: uri}))
 	                .then(Mopidy.execute('tracklist.shuffle'))
-	                .then(Mopidy.execute('playback.play'));
+	                .then(Mopidy.execute('playback.play'))
+	            }
+
+	            function showPlaylist (uri) {
+	                return $state.go('.show', {playlistUri: uri});
 	            }
 
 	        }
@@ -71194,20 +72959,187 @@
 	module.exports = Playlists;
 
 /***/ },
-/* 52 */
+/* 57 */
 /***/ function(module, exports) {
 
 	var path = 'playlists/playlists.html';
-	window.angular.module('ng').run(['$templateCache', function(c) { c.put(path, "<div class=\"playlists\">\n    <md-list>\n        <md-list-item class=\"md-3-line\" ng-repeat=\"playlist in playlists\" ng-click=\"addAndPlay(playlist.uri)\">\n            <!-- <img ng-src=\"{{item.face}}?{{$index}}\" class=\"md-avatar\" alt=\"{{item.who}}\" /> -->\n            <div class=\"md-list-item-text\">\n                {{ playlist.name }}\n            </div>\n        </md-list-item>\n    </md-list>\n</div>\n") }]);
+	window.angular.module('ng').run(['$templateCache', function(c) { c.put(path, "<div class=\"playlists\">\n    <md-list>\n        <md-list-item class=\"md-with-secondary--hover\" ng-repeat=\"playlist in playlists\" ng-click=\"showPlaylist(playlist.uri)\">\n            <p>{{ playlist.name }}</p>\n            <md-icon class=\"md-secondary material-icons\" ng-click=\"addAndPlay(playlist.uri)\">play_arrow</md-icon>\n        </md-list-item>\n    </md-list>\n</div>\n") }]);
 	module.exports = path;
 
 /***/ },
-/* 53 */
+/* 58 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var template = __webpack_require__(54)
+	var template = __webpack_require__(59)
+
+	function PlaylistsToolbar($state, Mopidy) {
+	    return {
+	        restrict: 'E',
+	        templateUrl: template,
+	        scope: {
+	            onSearch: '&',
+	            onClearSearch: '&'
+	        },
+	        link: function($scope) {
+	            $scope.vm = {};
+	            $scope.vm.clear = function clear() {
+	                $scope.vm.term = '';
+	                $scope.onClearSearch({state: true});
+	            }
+
+	            $scope.$watch('vm.term', function(term) {
+	                if(term && term.length > 2) {
+	                    $scope.onSearch({term: term});
+	                }
+	            })
+	        }
+	    }
+	}
+
+	module.exports = PlaylistsToolbar;
+
+/***/ },
+/* 59 */
+/***/ function(module, exports) {
+
+	var path = 'playlists/toolbar.html';
+	window.angular.module('ng').run(['$templateCache', function(c) { c.put(path, "<toolbar>\n    <md-input-container md-no-float>\n        <md-icon class=\"material-icons search\">search</md-icon>\n        <input ng-model=\"vm.term\" type=\"text\" placeholder=\"Search\">\n    </md-input-container>\n    \n    <md-button ng-if=\"vm.term\" ng-click=\"vm.clear()\" class=\"md-icon-button\">\n        <md-icon class=\"material-icons\">close</md-icon>\n    </md-button>\n</toolbar>\n") }]);
+	module.exports = path;
+
+/***/ },
+/* 60 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var template = __webpack_require__(61)
+
+	function PlaylistContainer($state, Mopidy) {
+	    return {
+	        restrict: 'E',
+	        templateUrl: template,
+	        scope: {
+	            uri: '@'
+	        },
+	        controller: function($scope) {
+	            $scope.playAll = playAll;
+	            
+	            function playAll (uri) {    
+	                return Mopidy.execute('tracklist.clear')
+	                .then(Mopidy.execute('tracklist.add', {uri: $scope.uri}))
+	                .then(Mopidy.execute('tracklist.shuffle'))
+	                .then(Mopidy.execute('playback.play'));
+	            }
+	        }
+	    }
+	}
+
+	module.exports = PlaylistContainer;
+
+/***/ },
+/* 61 */
+/***/ function(module, exports) {
+
+	var path = 'playlist/container.html';
+	window.angular.module('ng').run(['$templateCache', function(c) { c.put(path, "<playlist-toolbar on-play-all=\"playAll()\"></playlist-toolbar>\n<playlist class=\"main\" uri=\"{{ uri }}\"></playlist>") }]);
+	module.exports = path;
+
+/***/ },
+/* 62 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict'
+
+	var template = __webpack_require__(63)
+
+	function Playlist($state, Mopidy) {
+	    return {
+	        restrict: 'E',
+	        templateUrl: template,
+	        scope: {
+	            uri: '@'
+	        },
+	        controller: function($scope) {
+	            $scope.playlist = 'jaap'
+	            $scope.items = [];
+	            $scope.play = play;
+
+	            $scope.$watch('uri', getPlaylist);
+
+	            function getPlaylist(uri) {
+	                if(!uri) {
+	                    return;
+	                }
+	                return Mopidy.execute('library.lookup', {uri: uri})
+	                    .then(function(items) {
+	                        $scope.items = items;
+	                    })
+	            }
+
+	            function play(uri) {    
+	                return Mopidy.execute('tracklist.clear')
+	                    .then(Mopidy.execute('tracklist.add', {uri: uri}))
+	                    .then(Mopidy.execute('playback.play'));
+	            }
+
+	        }
+	    }
+	}
+
+	module.exports = Playlist
+
+/***/ },
+/* 63 */
+/***/ function(module, exports) {
+
+	var path = 'playlist/playlist.html';
+	window.angular.module('ng').run(['$templateCache', function(c) { c.put(path, "<md-list>\n    <md-list-item ng-repeat=\"item in items\" ng-click=\"play(item.uri)\">\n        <p>{{ item.artists[0].name }} - {{ item.name }}</p>\n    </md-list-item>\n</md-list>") }]);
+	module.exports = path;
+
+/***/ },
+/* 64 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict'
+
+	var template = __webpack_require__(65)
+
+	function PlaylistToolbar($state, Mopidy) {
+	    return {
+	        restrict: 'E',
+	        templateUrl: template,
+	        scope: {
+	            onPlayAll: '&'
+	        },
+	        controller: function($scope, $state) {
+	            $scope.back = back;
+
+	            function back() {
+	                return $state.go('^')
+	            }
+	        }
+	    }
+	}
+
+	module.exports = PlaylistToolbar
+
+/***/ },
+/* 65 */
+/***/ function(module, exports) {
+
+	var path = 'playlist/toolbar.html';
+	window.angular.module('ng').run(['$templateCache', function(c) { c.put(path, "<toolbar>\n    <md-button class=\"md-icon-button\" aria-label=\"back\" ng-click=\"back()\">\n        <md-icon class=\"material-icons\">arrow_back</md-icon>\n    </md-button>\n    <h2>Playlist</h2>\n    <div flex=\"\"></div>\n    <md-button class=\"md-icon-button\" aria-label=\"play all\" ng-click=\"onPlayAll()\">\n        <md-icon class=\"material-icons\">play_arrow</md-icon>\n    </md-button>\n</toolbar>") }]);
+	module.exports = path;
+
+/***/ },
+/* 66 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var template = __webpack_require__(67)
 
 	function Settings() {
 	    return {
@@ -71222,7 +73154,7 @@
 	module.exports = Settings;
 
 /***/ },
-/* 54 */
+/* 67 */
 /***/ function(module, exports) {
 
 	var path = 'settings/settings.html';
@@ -71230,32 +73162,29 @@
 	module.exports = path;
 
 /***/ },
-/* 55 */
+/* 68 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var template = __webpack_require__(56)
+	var template = __webpack_require__(69)
 
 	function Toolbar() {
 	    return {
 	        restrict: 'E',
 	        templateUrl: template,
-	        controller: function($scope, $rootScope) {
-	            $scope.stateTitle = $rootScope.pageTitle;
-
-	        }
+	        transclude: true
 	    }
 	}
 
 	module.exports = Toolbar;
 
 /***/ },
-/* 56 */
+/* 69 */
 /***/ function(module, exports) {
 
 	var path = 'toolbar/toolbar.html';
-	window.angular.module('ng').run(['$templateCache', function(c) { c.put(path, "<md-toolbar>\n    <div class=\"md-toolbar-tools\">\n        <h2>\n          <span>{{ stateTitle }}</span>\n        </h2>\n\n        <span flex></span>\n        \n        <md-button class=\"md-icon-button\" aria-label=\"Favorite\" ui-sref=\"app.settings\">\n            <md-icon>settings</md-icon>\n        </md-button>\n    </div>\n</md-toolbar>\n") }]);
+	window.angular.module('ng').run(['$templateCache', function(c) { c.put(path, "<md-toolbar>\n    <div class=\"md-toolbar-tools\" ng-transclude></div>\n</md-toolbar>\n") }]);
 	module.exports = path;
 
 /***/ }
