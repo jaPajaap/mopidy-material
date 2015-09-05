@@ -11,7 +11,7 @@
 
 html,
 body {
-    overflow-scrolling: auto;
+    -webkit-overflow-scrolling: auto;
 }
 
 body {
@@ -73,7 +73,7 @@ search-results {
 .main {
     flex: 1;
     overflow-y: scroll;
-    overflow-scrolling: touch;
+    -webkit-overflow-scrolling: touch;
 }
 
 .browser {
