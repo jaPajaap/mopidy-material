@@ -4,7 +4,7 @@ var mopidyHost = '192.168.1.103:6680';
 var hostname = window.location.hostname;
 var host = window.location.host;
 
-var appUrl = isLocal() ? 'http://' + host : mopidyHost + '/material';
+var appUrl = isLocal() ? 'http://' + host : 'http://' + mopidyHost + '/material';
 var mopidyUrl = isLocal() ? '127.0.0.1:6680' : mopidyHost;
 console.log(appUrl, mopidyUrl);
 
