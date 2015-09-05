@@ -8,7 +8,7 @@ var TARGET = process.env.npm_lifecycle_event;
 var common = {
     entry: './app/main.js',
     output: {
-        path: './build',
+        path: './mopidy_material/public',
         filename: 'bundle.js',
     },
     module: {
