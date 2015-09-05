@@ -11,7 +11,7 @@
 
 html,
 body {
-    -webkit-overflow-scrolling: auto;
+    overflow: hidden;
 }
 
 body {
@@ -20,7 +20,6 @@ body {
     display: flex;
     align-items: stretch;
     justify-content: center;
-    overflow: hidden;
 }
 
 
