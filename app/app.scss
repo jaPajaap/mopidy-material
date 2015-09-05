@@ -8,6 +8,12 @@
 @import 'styles/vars';
 @import 'styles/typography';
 //style
+
+html,
+body {
+    overflow-scrolling: auto;
+}
+
 body {
     color: $font-color--dark;
     background-color: $background--light;
@@ -16,6 +22,8 @@ body {
     justify-content: center;
     overflow: hidden;
 }
+
+
 
 #app {
     margin: 0;
@@ -64,7 +72,8 @@ search-results {
 
 .main {
     flex: 1;
-    overflow-y: auto;
+    overflow-y: scroll;
+    overflow-scrolling: touch;
 }
 
 .browser {
