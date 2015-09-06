@@ -1,9 +1,28 @@
 'use strict';
 
 function States($urlRouterProvider, $stateProvider, SpotifyProvider) {
-    checkToken()
+    $urlRouterProvider.otherwise(function($injector, $location) {
+        console.log('hash', location.hash);
+        var hash = {};
+        location.hash.replace(/^#\/?/, '').split('&').forEach(function(kv) {
+            var spl = kv.indexOf('=');
+            if (spl != -1) {
+                hash[kv.substring(0, spl)] = decodeURIComponent(kv.substring(spl + 1));
+            }
+        });
+        
+        console.log('initial hash', hash);
+        
+        debugger;
+        if (hash.access_token) {
+            localStorage.setItem('spotify-token', hash.access_token);
+            SpotifyProvider.setAuthToken(hash.access_token);
+            $location.url('/playlists');
+        } else {
+            $location.url('/playlists');
+        }
+    });
 
-    $urlRouterProvider.otherwise('/playlists')
 
     $stateProvider
         .state('app', {
@@ -45,23 +64,6 @@ function States($urlRouterProvider, $stateProvider, SpotifyProvider) {
             url: '/reconnect',
             template: '<h1>Mopidy connection error</h1><a ui-sref="app.playlists">reconnect</a>'
         });
-
-    function checkToken() {
-        console.log('hash', location.hash);
-        var hash = {};
-        location.hash.replace(/^#\/?/, '').split('&').forEach(function(kv) {
-            var spl = kv.indexOf('=');
-            if (spl != -1) {
-                hash[kv.substring(0, spl)] = decodeURIComponent(kv.substring(spl + 1));
-            }
-        });
-        
-        console.log('initial hash', hash);
-        if (hash.access_token) {
-            localStorage.setItem('spotify-token', hash.access_token);
-            SpotifyProvider.setAuthToken(hash.access_token);
-        }
-    }
 }
 
 
@@ -79,9 +81,6 @@ function getMe($q, $window, $stateParams, Spotify) {
     return Spotify.getCurrentUser()
         .catch(function() {
             return Spotify.login()
-        })
-        .then(function() {
-            return Spotify.getCurrentUser()
         })
 }
 
