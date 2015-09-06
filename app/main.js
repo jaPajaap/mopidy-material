@@ -8,12 +8,16 @@ require('angular-aria');
 require('angular-animate');
 require('angular-material');
 require('angular-hotkeys');
+require('angular-touch');
+// require('inobounce');
+
 
 require('./app.scss');
 
 // create and bootstrap application
 
 var requires = [
+    'ngTouch',
     'spotify',
     'ui.router',
     'ngMaterial',
@@ -32,6 +36,8 @@ angular.module('app').run(require('./config/run'));
 
 angular.module('app').service('Mopidy', require('./services/mopidy.js'));
 angular.module('app').service('Util', require('./services/util.js'));
+
+angular.module('app').directive('scrollable', require('./components/scrollable'));
 
 angular.module('app').directive('container', require('./container/container'));
 angular.module('app').directive('player', require('./player/player'));

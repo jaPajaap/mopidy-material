@@ -14,6 +14,11 @@ body {
     overflow: hidden;
 }
 
+* {
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
+
 body {
     color: $font-color--dark;
     background-color: $background--light;
@@ -69,7 +74,7 @@ search-results {
     }
 }
 
-.main {
+.scrollable {
     flex: 1;
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;

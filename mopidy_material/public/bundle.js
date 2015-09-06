@@ -54,12 +54,16 @@
 	__webpack_require__(7);
 	__webpack_require__(9);
 	__webpack_require__(11);
-
 	__webpack_require__(12);
+	// require('inobounce');
+
+
+	__webpack_require__(14);
 
 	// create and bootstrap application
 
 	var requires = [
+	    'ngTouch',
 	    'spotify',
 	    'ui.router',
 	    'ngMaterial',
@@ -69,27 +73,29 @@
 	// mount on window for testing
 	angular.module('app', requires);
 
-	angular.module('app').constant('AppSettings', __webpack_require__(16));
+	angular.module('app').constant('AppSettings', __webpack_require__(18));
 
-	angular.module('app').config(__webpack_require__(17));
-	angular.module('app').config(__webpack_require__(18));
+	angular.module('app').config(__webpack_require__(19));
+	angular.module('app').config(__webpack_require__(20));
 
-	angular.module('app').run(__webpack_require__(19));
+	angular.module('app').run(__webpack_require__(21));
 
-	angular.module('app').service('Mopidy', __webpack_require__(20));
-	angular.module('app').service('Util', __webpack_require__(48));
+	angular.module('app').service('Mopidy', __webpack_require__(22));
+	angular.module('app').service('Util', __webpack_require__(50));
 
-	angular.module('app').directive('container', __webpack_require__(49));
-	angular.module('app').directive('player', __webpack_require__(50));
-	angular.module('app').directive('searchResults', __webpack_require__(52));
-	angular.module('app').directive('playlistsContainer', __webpack_require__(54));
-	angular.module('app').directive('playlists', __webpack_require__(56));
-	angular.module('app').directive('playlistsToolbar', __webpack_require__(58));
-	angular.module('app').directive('playlistContainer', __webpack_require__(60));
-	angular.module('app').directive('playlist', __webpack_require__(62));
-	angular.module('app').directive('playlistToolbar', __webpack_require__(64));
-	angular.module('app').directive('settings', __webpack_require__(66));
-	angular.module('app').directive('toolbar', __webpack_require__(68));
+	angular.module('app').directive('scrollable', __webpack_require__(51));
+
+	angular.module('app').directive('container', __webpack_require__(52));
+	angular.module('app').directive('player', __webpack_require__(53));
+	angular.module('app').directive('searchResults', __webpack_require__(55));
+	angular.module('app').directive('playlistsContainer', __webpack_require__(57));
+	angular.module('app').directive('playlists', __webpack_require__(59));
+	angular.module('app').directive('playlistsToolbar', __webpack_require__(61));
+	angular.module('app').directive('playlistContainer', __webpack_require__(63));
+	angular.module('app').directive('playlist', __webpack_require__(65));
+	angular.module('app').directive('playlistToolbar', __webpack_require__(67));
+	angular.module('app').directive('settings', __webpack_require__(69));
+	angular.module('app').directive('toolbar', __webpack_require__(71));
 
 
 	angular.bootstrap(document.body, ['app']);
@@ -108,7 +114,7 @@
 /***/ function(module, exports) {
 
 	/**
-	 * @license AngularJS v1.4.4
+	 * @license AngularJS v1.4.5
 	 * (c) 2010-2015 Google, Inc. http://angularjs.org
 	 * License: MIT
 	 */
@@ -166,7 +172,7 @@
 	      return match;
 	    });
 
-	    message += '\nhttp://errors.angularjs.org/1.4.4/' +
+	    message += '\nhttp://errors.angularjs.org/1.4.5/' +
 	      (module ? module + '/' : '') + code;
 
 	    for (i = SKIP_INDEXES, paramPrefix = '?'; i < templateArgs.length; i++, paramPrefix = '&') {
@@ -2483,11 +2489,11 @@
 	 * - `codeName` – `{string}` – Code name of the release, such as "jiggling-armfat".
 	 */
 	var version = {
-	  full: '1.4.4',    // all of these placeholder strings will be replaced by grunt's
+	  full: '1.4.5',    // all of these placeholder strings will be replaced by grunt's
 	  major: 1,    // package task
 	  minor: 4,
-	  dot: 4,
-	  codeName: 'pylon-requirement'
+	  dot: 5,
+	  codeName: 'permanent-internship'
 	};
 
 
@@ -2692,7 +2698,7 @@
 	 * - [`html()`](http://api.jquery.com/html/)
 	 * - [`next()`](http://api.jquery.com/next/) - Does not support selectors
 	 * - [`on()`](http://api.jquery.com/on/) - Does not support namespaces, selectors or eventData
-	 * - [`off()`](http://api.jquery.com/off/) - Does not support namespaces or selectors
+	 * - [`off()`](http://api.jquery.com/off/) - Does not support namespaces, selectors or event object as parameter
 	 * - [`one()`](http://api.jquery.com/one/) - Does not support namespaces or selectors
 	 * - [`parent()`](http://api.jquery.com/parent/) - Does not support selectors
 	 * - [`prepend()`](http://api.jquery.com/prepend/)
@@ -2706,7 +2712,7 @@
 	 * - [`text()`](http://api.jquery.com/text/)
 	 * - [`toggleClass()`](http://api.jquery.com/toggleClass/)
 	 * - [`triggerHandler()`](http://api.jquery.com/triggerHandler/) - Passes a dummy event object to handlers.
-	 * - [`unbind()`](http://api.jquery.com/unbind/) - Does not support namespaces
+	 * - [`unbind()`](http://api.jquery.com/unbind/) - Does not support namespaces or event object as parameter
 	 * - [`val()`](http://api.jquery.com/val/)
 	 * - [`wrap()`](http://api.jquery.com/wrap/)
 	 *
@@ -5501,10 +5507,10 @@
 	        return this.getPromise().then(f1,f2);
 	      },
 	      'catch': function(f1) {
-	        return this.getPromise().catch(f1);
+	        return this.getPromise()['catch'](f1);
 	      },
 	      'finally': function(f1) {
-	        return this.getPromise().finally(f1);
+	        return this.getPromise()['finally'](f1);
 	      }
 	    };
 
@@ -15026,7 +15032,7 @@
 	                               $window.webkitCancelRequestAnimationFrame;
 
 	    var rafSupported = !!requestAnimationFrame;
-	    var rafFn = rafSupported
+	    var raf = rafSupported
 	      ? function(fn) {
 	          var id = requestAnimationFrame(fn);
 	          return function() {
@@ -15040,47 +15046,9 @@
 	          };
 	        };
 
-	    queueFn.supported = rafSupported;
+	    raf.supported = rafSupported;
 
-	    var cancelLastRAF;
-	    var taskCount = 0;
-	    var taskQueue = [];
-	    return queueFn;
-
-	    function flush() {
-	      for (var i = 0; i < taskQueue.length; i++) {
-	        var task = taskQueue[i];
-	        if (task) {
-	          taskQueue[i] = null;
-	          task();
-	        }
-	      }
-	      taskCount = taskQueue.length = 0;
-	    }
-
-	    function queueFn(asyncFn) {
-	      var index = taskQueue.length;
-
-	      taskCount++;
-	      taskQueue.push(asyncFn);
-
-	      if (index === 0) {
-	        cancelLastRAF = rafFn(flush);
-	      }
-
-	      return function cancelQueueFn() {
-	        if (index >= 0) {
-	          taskQueue[index] = null;
-	          index = null;
-
-	          if (--taskCount === 0 && cancelLastRAF) {
-	            cancelLastRAF();
-	            cancelLastRAF = null;
-	            taskQueue.length = 0;
-	          }
-	        }
-	      };
-	    }
+	    return raf;
 	  }];
 	}
 
@@ -20437,7 +20405,6 @@
 	       </script>
 	       <style>
 	        .my-form {
-	          -webkit-transition:all linear 0.5s;
 	          transition:all linear 0.5s;
 	          background: transparent;
 	        }
@@ -22826,7 +22793,6 @@
 	     </file>
 	     <file name="style.css">
 	       .base-class {
-	         -webkit-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
 	         transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
 	       }
 
@@ -24001,7 +23967,6 @@
 	      }
 
 	      .animate-if.ng-enter, .animate-if.ng-leave {
-	        -webkit-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
 	        transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
 	      }
 
@@ -24150,7 +24115,6 @@
 	      }
 
 	      .slide-animate.ng-enter, .slide-animate.ng-leave {
-	        -webkit-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
 	        transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
 
 	        position:absolute;
@@ -25489,7 +25453,6 @@
 	       </script>
 	       <style>
 	         .my-input {
-	           -webkit-transition:all linear 0.5s;
 	           transition:all linear 0.5s;
 	           background: transparent;
 	         }
@@ -27163,7 +27126,6 @@
 	      .animate-repeat.ng-move,
 	      .animate-repeat.ng-enter,
 	      .animate-repeat.ng-leave {
-	        -webkit-transition:all linear 0.5s;
 	        transition:all linear 0.5s;
 	      }
 
@@ -27560,9 +27522,7 @@
 	        background: white;
 	      }
 
-	      .animate-show.ng-hide-add.ng-hide-add-active,
-	      .animate-show.ng-hide-remove.ng-hide-remove-active {
-	        -webkit-transition: all linear 0.5s;
+	      .animate-show.ng-hide-add, .animate-show.ng-hide-remove {
 	        transition: all linear 0.5s;
 	      }
 
@@ -27719,7 +27679,6 @@
 	    </file>
 	    <file name="animations.css">
 	      .animate-hide {
-	        -webkit-transition: all linear 0.5s;
 	        transition: all linear 0.5s;
 	        line-height: 20px;
 	        opacity: 1;
@@ -27918,7 +27877,6 @@
 	      }
 
 	      .animate-switch.ng-animate {
-	        -webkit-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
 	        transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
 
 	        position:absolute;
@@ -28259,31 +28217,162 @@
 	 * @description
 	 * HTML `SELECT` element with angular data-binding.
 	 *
-	 * In many cases, `ngRepeat` can be used on `<option>` elements instead of {@link ng.directive:ngOptions
-	 * ngOptions} to achieve a similar result. However, `ngOptions` provides some benefits such as reducing
-	 * memory and increasing speed by not creating a new scope for each repeated instance, as well as providing
-	 * more flexibility in how the `<select>`'s model is assigned via the `select` **`as`** part of the
-	 * comprehension expression.
+	 * The `select` directive is used together with {@link ngModel `ngModel`} to provide data-binding
+	 * between the scope and the `<select>` control (including setting default values).
+	 * Ìt also handles dynamic `<option>` elements, which can be added using the {@link ngRepeat `ngRepeat}` or
+	 * {@link ngOptions `ngOptions`} directives.
 	 *
-	 * When an item in the `<select>` menu is selected, the array element or object property
-	 * represented by the selected option will be bound to the model identified by the `ngModel`
-	 * directive.
+	 * When an item in the `<select>` menu is selected, the value of the selected option will be bound
+	 * to the model identified by the `ngModel` directive. With static or repeated options, this is
+	 * the content of the `value` attribute or the textContent of the `<option>`, if the value attribute is missing.
+	 * If you want dynamic value attributes, you can use interpolation inside the value attribute.
 	 *
-	 * If the viewValue contains a value that doesn't match any of the options then the control
-	 * will automatically add an "unknown" option, which it then removes when this is resolved.
+	 * <div class="alert alert-warning">
+	 * Note that the value of a `select` directive used without `ngOptions` is always a string.
+	 * When the model needs to be bound to a non-string value, you must either explictly convert it
+	 * using a directive (see example below) or use `ngOptions` to specify the set of options.
+	 * This is because an option element can only be bound to string values at present.
+	 * </div>
+	 *
+	 * If the viewValue of `ngModel` does not match any of the options, then the control
+	 * will automatically add an "unknown" option, which it then removes when the mismatch is resolved.
 	 *
 	 * Optionally, a single hard-coded `<option>` element, with the value set to an empty string, can
 	 * be nested into the `<select>` element. This element will then represent the `null` or "not selected"
 	 * option. See example below for demonstration.
 	 *
 	 * <div class="alert alert-info">
-	 * The value of a `select` directive used without `ngOptions` is always a string.
-	 * When the model needs to be bound to a non-string value, you must either explictly convert it
-	 * using a directive (see example below) or use `ngOptions` to specify the set of options.
-	 * This is because an option element can only be bound to string values at present.
+	 * In many cases, `ngRepeat` can be used on `<option>` elements instead of {@link ng.directive:ngOptions
+	 * ngOptions} to achieve a similar result. However, `ngOptions` provides some benefits, such as
+	 * more flexibility in how the `<select>`'s model is assigned via the `select` **`as`** part of the
+	 * comprehension expression, and additionally in reducing memory and increasing speed by not creating
+	 * a new scope for each repeated instance.
 	 * </div>
 	 *
-	 * ### Example (binding `select` to a non-string value)
+	 *
+	 * @param {string} ngModel Assignable angular expression to data-bind to.
+	 * @param {string=} name Property name of the form under which the control is published.
+	 * @param {string=} required Sets `required` validation error key if the value is not entered.
+	 * @param {string=} ngRequired Adds required attribute and required validation constraint to
+	 * the element when the ngRequired expression evaluates to true. Use ngRequired instead of required
+	 * when you want to data-bind to the required attribute.
+	 * @param {string=} ngChange Angular expression to be executed when selected option(s) changes due to user
+	 *    interaction with the select element.
+	 * @param {string=} ngOptions sets the options that the select is populated with and defines what is
+	 * set on the model on selection. See {@link ngOptions `ngOptions`}.
+	 *
+	 * @example
+	 * ### Simple `select` elements with static options
+	 *
+	 * <example name="static-select" module="staticSelect">
+	 * <file name="index.html">
+	 * <div ng-controller="ExampleController">
+	 *   <form name="myForm">
+	 *     <label for="singleSelect"> Single select: </label><br>
+	 *     <select name="singleSelect" ng-model="data.singleSelect">
+	 *       <option value="option-1">Option 1</option>
+	 *       <option value="option-2">Option 2</option>
+	 *     </select><br>
+	 *
+	 *     <label for="singleSelect"> Single select with "not selected" option and dynamic option values: </label><br>
+	 *     <select name="singleSelect" ng-model="data.singleSelect">
+	 *       <option value="">---Please select---</option> <!-- not selected / blank option -->
+	 *       <option value="{{data.option1}}">Option 1</option> <!-- interpolation -->
+	 *       <option value="option-2">Option 2</option>
+	 *     </select><br>
+	 *     <button ng-click="forceUnknownOption()">Force unknown option</button><br>
+	 *     <tt>singleSelect = {{data.singleSelect}}</tt>
+	 *
+	 *     <hr>
+	 *     <label for="multipleSelect"> Multiple select: </label><br>
+	 *     <select name="multipleSelect" id="multipleSelect" ng-model="data.multipleSelect" multiple>
+	 *       <option value="option-1">Option 1</option>
+	 *       <option value="option-2">Option 2</option>
+	 *       <option value="option-3">Option 3</option>
+	 *     </select><br>
+	 *     <tt>multipleSelect = {{data.multipleSelect}}</tt><br/>
+	 *   </form>
+	 * </div>
+	 * </file>
+	 * <file name="app.js">
+	 *  angular.module('staticSelect', [])
+	 *    .controller('ExampleController', ['$scope', function($scope) {
+	 *      $scope.data = {
+	 *       singleSelect: null,
+	 *       multipleSelect: [],
+	 *       option1: 'option-1',
+	 *      };
+	 *
+	 *      $scope.forceUnknownOption = function() {
+	 *        $scope.data.singleSelect = 'nonsense';
+	 *      };
+	 *   }]);
+	 * </file>
+	 *</example>
+	 *
+	 * ### Using `ngRepeat` to generate `select` options
+	 * <example name="ngrepeat-select" module="ngrepeatSelect">
+	 * <file name="index.html">
+	 * <div ng-controller="ExampleController">
+	 *   <form name="myForm">
+	 *     <label for="repeatSelect"> Repeat select: </label>
+	 *     <select name="repeatSelect" ng-model="data.repeatSelect">
+	 *       <option ng-repeat="option in data.availableOptions" value="{{option.id}}">{{option.name}}</option>
+	 *     </select>
+	 *   </form>
+	 *   <hr>
+	 *   <tt>repeatSelect = {{data.repeatSelect}}</tt><br/>
+	 * </div>
+	 * </file>
+	 * <file name="app.js">
+	 *  angular.module('ngrepeatSelect', [])
+	 *    .controller('ExampleController', ['$scope', function($scope) {
+	 *      $scope.data = {
+	 *       singleSelect: null,
+	 *       availableOptions: [
+	 *         {id: '1', name: 'Option A'},
+	 *         {id: '2', name: 'Option B'},
+	 *         {id: '3', name: 'Option C'}
+	 *       ],
+	 *      };
+	 *   }]);
+	 * </file>
+	 *</example>
+	 *
+	 *
+	 * ### Using `select` with `ngOptions` and setting a default value
+	 * See the {@link ngOptions ngOptions documentation} for more `ngOptions` usage examples.
+	 *
+	 * <example name="select-with-default-values" module="defaultValueSelect">
+	 * <file name="index.html">
+	 * <div ng-controller="ExampleController">
+	 *   <form name="myForm">
+	 *     <label for="mySelect">Make a choice:</label>
+	 *     <select name="mySelect" id="mySelect"
+	 *       ng-options="option.name for option in data.availableOptions track by option.id"
+	 *       ng-model="data.selectedOption"></select>
+	 *   </form>
+	 *   <hr>
+	 *   <tt>option = {{data.selectedOption}}</tt><br/>
+	 * </div>
+	 * </file>
+	 * <file name="app.js">
+	 *  angular.module('defaultValueSelect', [])
+	 *    .controller('ExampleController', ['$scope', function($scope) {
+	 *      $scope.data = {
+	 *       availableOptions: [
+	 *         {id: '1', name: 'Option A'},
+	 *         {id: '2', name: 'Option B'},
+	 *         {id: '3', name: 'Option C'}
+	 *       ],
+	 *       selectedOption: {id: '3', name: 'Option C'} //This sets the default value of the select in the ui
+	 *       };
+	 *   }]);
+	 * </file>
+	 *</example>
+	 *
+	 *
+	 * ### Binding `select` to a non-string value via `ngModel` parsing / formatting
 	 *
 	 * <example name="select-with-non-string-options" module="nonStringSelect">
 	 *   <file name="index.html">
@@ -28517,8 +28606,9 @@
 	        ctrl.$validate();
 	      });
 
-	      ctrl.$validators.pattern = function(value) {
-	        return ctrl.$isEmpty(value) || isUndefined(regexp) || regexp.test(value);
+	      ctrl.$validators.pattern = function(modelValue, viewValue) {
+	        // HTML5 pattern constraint validates the input value, so we validate the viewValue
+	        return ctrl.$isEmpty(viewValue) || isUndefined(regexp) || regexp.test(viewValue);
 	      };
 	    }
 	  };
@@ -33158,8 +33248,17 @@
 	          this.toQueryString = utils.toQueryString;
 	        }
 
-	        function openDialog (uri) {
-	          return window.location = uri;
+	        function openDialog (uri, name, options, cb) {
+	          var win = window.open(uri, name, options);
+	          var interval = window.setInterval(function () {
+	            try {
+	              if (!win || win.closed) {
+	                window.clearInterval(interval);
+	                cb(win);
+	              }
+	            } catch (e) {}
+	          }, 1000);
+	          return win;
 	        }
 
 	        NgSpotify.prototype = {
@@ -33509,11 +33608,15 @@
 	            };
 
 	            var authCompleted = false;
-	            console.log(this.redirectUri);
-	            debugger;
 	            var authWindow = openDialog(
 	              'https://accounts.spotify.com/authorize?' + this.toQueryString(params),
-	              'Spotify'
+	              'Spotify',
+	              'menubar=no,location=no,resizable=yes,scrollbars=yes,status=no,width=' + w + ',height=' + h + ',top=' + top + ',left=' + left,
+	              function () {
+	                if (!authCompleted) {
+	                  deferred.reject();
+	                }
+	              }
 	            );
 
 	            function storageChanged (e) {
@@ -33555,7 +33658,7 @@
 /***/ function(module, exports) {
 
 	/**
-	 * @license AngularJS v1.4.4
+	 * @license AngularJS v1.4.5
 	 * (c) 2010-2015 Google, Inc. http://angularjs.org
 	 * License: MIT
 	 */
@@ -33962,7 +34065,7 @@
 /***/ function(module, exports) {
 
 	/**
-	 * @license AngularJS v1.4.4
+	 * @license AngularJS v1.4.5
 	 * (c) 2010-2015 Google, Inc. http://angularjs.org
 	 * License: MIT
 	 */
@@ -34342,6 +34445,55 @@
 	  }];
 	}
 
+	var $$rAFSchedulerFactory = ['$$rAF', function($$rAF) {
+	  var queue, cancelFn;
+
+	  function scheduler(tasks) {
+	    // we make a copy since RAFScheduler mutates the state
+	    // of the passed in array variable and this would be difficult
+	    // to track down on the outside code
+	    queue = queue.concat(tasks);
+	    nextTick();
+	  }
+
+	  queue = scheduler.queue = [];
+
+	  /* waitUntilQuiet does two things:
+	   * 1. It will run the FINAL `fn` value only when an uncancelled RAF has passed through
+	   * 2. It will delay the next wave of tasks from running until the quiet `fn` has run.
+	   *
+	   * The motivation here is that animation code can request more time from the scheduler
+	   * before the next wave runs. This allows for certain DOM properties such as classes to
+	   * be resolved in time for the next animation to run.
+	   */
+	  scheduler.waitUntilQuiet = function(fn) {
+	    if (cancelFn) cancelFn();
+
+	    cancelFn = $$rAF(function() {
+	      cancelFn = null;
+	      fn();
+	      nextTick();
+	    });
+	  };
+
+	  return scheduler;
+
+	  function nextTick() {
+	    if (!queue.length) return;
+
+	    var items = queue.shift();
+	    for (var i = 0; i < items.length; i++) {
+	      items[i]();
+	    }
+
+	    if (!cancelFn) {
+	      $$rAF(function() {
+	        if (!cancelFn) nextTick();
+	      });
+	    }
+	  }
+	}];
+
 	var $$AnimateChildrenDirective = [function() {
 	  return function(scope, element, attrs) {
 	    var val = attrs.ngAnimateChildren;
@@ -34355,6 +34507,8 @@
 	    }
 	  };
 	}];
+
+	var ANIMATE_TIMER_KEY = '$$animateCss';
 
 	/**
 	 * @ngdoc service
@@ -34682,8 +34836,10 @@
 	  var gcsLookup = createLocalCacheLookup();
 	  var gcsStaggerLookup = createLocalCacheLookup();
 
-	  this.$get = ['$window', '$$jqLite', '$$AnimateRunner', '$timeout', '$$forceReflow', '$sniffer', '$$rAF',
-	       function($window,   $$jqLite,   $$AnimateRunner,   $timeout,   $$forceReflow,   $sniffer,   $$rAF) {
+	  this.$get = ['$window', '$$jqLite', '$$AnimateRunner', '$timeout',
+	               '$$forceReflow', '$sniffer', '$$rAFScheduler', '$animate',
+	       function($window,   $$jqLite,   $$AnimateRunner,   $timeout,
+	                $$forceReflow,   $sniffer,   $$rAFScheduler, $animate) {
 
 	    var applyAnimationClasses = applyAnimationClassesFactory($$jqLite);
 
@@ -34743,12 +34899,8 @@
 	    var cancelLastRAFRequest;
 	    var rafWaitQueue = [];
 	    function waitUntilQuiet(callback) {
-	      if (cancelLastRAFRequest) {
-	        cancelLastRAFRequest(); //cancels the request
-	      }
 	      rafWaitQueue.push(callback);
-	      cancelLastRAFRequest = $$rAF(function() {
-	        cancelLastRAFRequest = null;
+	      $$rAFScheduler.waitUntilQuiet(function() {
 	        gcsLookup.flush();
 	        gcsStaggerLookup.flush();
 
@@ -34765,8 +34917,6 @@
 	      });
 	    }
 
-	    return init;
-
 	    function computeTimings(node, className, cacheKey) {
 	      var timings = computeCachedCssStyles(node, className, cacheKey, DETECT_CSS_PROPERTIES);
 	      var aD = timings.animationDelay;
@@ -34781,9 +34931,11 @@
 	      return timings;
 	    }
 
-	    function init(element, options) {
+	    return function init(element, options) {
 	      var node = getDomNode(element);
-	      if (!node || !node.parentNode) {
+	      if (!node
+	          || !node.parentNode
+	          || !$animate.enabled()) {
 	        return closeAndReturnNoopAnimator();
 	      }
 
@@ -34839,7 +34991,6 @@
 	      // there actually is a detected transition or keyframe animation
 	      if (options.applyClassesEarly && addRemoveClassName.length) {
 	        applyAnimationClasses(element, options);
-	        addRemoveClassName = '';
 	      }
 
 	      var preparationClasses = [structuralClassName, addRemoveClassName].join(' ').trim();
@@ -34952,6 +35103,18 @@
 
 	      if (maxDuration === 0 && !flags.recalculateTimingStyles) {
 	        return closeAndReturnNoopAnimator();
+	      }
+
+	      if (options.delay != null) {
+	        var delayStyle = parseFloat(options.delay);
+
+	        if (flags.applyTransitionDelay) {
+	          temporaryStyles.push(getCssDelayStyle(delayStyle));
+	        }
+
+	        if (flags.applyAnimationDelay) {
+	          temporaryStyles.push(getCssDelayStyle(delayStyle, true));
+	        }
 	      }
 
 	      // we need to recalculate the delay value since we used a pre-emptive negative
@@ -35068,6 +35231,8 @@
 	          cancel: cancelFn
 	        });
 
+	        // should flush the cache animation
+	        waitUntilQuiet(noop);
 	        close();
 
 	        return {
@@ -35165,27 +35330,16 @@
 	            flags.hasAnimations = timings.animationDuration > 0;
 	          }
 
-	          if (flags.applyTransitionDelay || flags.applyAnimationDelay) {
+	          if (flags.applyAnimationDelay) {
 	            relativeDelay = typeof options.delay !== "boolean" && truthyTimingValue(options.delay)
 	                  ? parseFloat(options.delay)
 	                  : relativeDelay;
 
 	            maxDelay = Math.max(relativeDelay, 0);
-
-	            var delayStyle;
-	            if (flags.applyTransitionDelay) {
-	              timings.transitionDelay = relativeDelay;
-	              delayStyle = getCssDelayStyle(relativeDelay);
-	              temporaryStyles.push(delayStyle);
-	              node.style[delayStyle[0]] = delayStyle[1];
-	            }
-
-	            if (flags.applyAnimationDelay) {
-	              timings.animationDelay = relativeDelay;
-	              delayStyle = getCssDelayStyle(relativeDelay, true);
-	              temporaryStyles.push(delayStyle);
-	              node.style[delayStyle[0]] = delayStyle[1];
-	            }
+	            timings.animationDelay = relativeDelay;
+	            delayStyle = getCssDelayStyle(relativeDelay, true);
+	            temporaryStyles.push(delayStyle);
+	            node.style[delayStyle[0]] = delayStyle[1];
 	          }
 
 	          maxDelayTime = maxDelay * ONE_SECOND;
@@ -35214,17 +35368,47 @@
 	          }
 
 	          startTime = Date.now();
-	          element.on(events.join(' '), onAnimationProgress);
-	          $timeout(onAnimationExpired, maxDelayTime + CLOSING_TIME_BUFFER * maxDurationTime, false);
+	          var timerTime = maxDelayTime + CLOSING_TIME_BUFFER * maxDurationTime;
+	          var endTime = startTime + timerTime;
 
+	          var animationsData = element.data(ANIMATE_TIMER_KEY) || [];
+	          var setupFallbackTimer = true;
+	          if (animationsData.length) {
+	            var currentTimerData = animationsData[0];
+	            setupFallbackTimer = endTime > currentTimerData.expectedEndTime;
+	            if (setupFallbackTimer) {
+	              $timeout.cancel(currentTimerData.timer);
+	            } else {
+	              animationsData.push(close);
+	            }
+	          }
+
+	          if (setupFallbackTimer) {
+	            var timer = $timeout(onAnimationExpired, timerTime, false);
+	            animationsData[0] = {
+	              timer: timer,
+	              expectedEndTime: endTime
+	            };
+	            animationsData.push(close);
+	            element.data(ANIMATE_TIMER_KEY, animationsData);
+	          }
+
+	          element.on(events.join(' '), onAnimationProgress);
 	          applyAnimationToStyles(element, options);
 	        }
 
 	        function onAnimationExpired() {
-	          // although an expired animation is a failed animation, getting to
-	          // this outcome is very easy if the CSS code screws up. Therefore we
-	          // should still continue normally as if the animation completed correctly.
-	          close();
+	          var animationsData = element.data(ANIMATE_TIMER_KEY);
+
+	          // this will be false in the event that the element was
+	          // removed from the DOM (via a leave animation or something
+	          // similar)
+	          if (animationsData) {
+	            for (var i = 1; i < animationsData.length; i++) {
+	              animationsData[i]();
+	            }
+	            element.removeData(ANIMATE_TIMER_KEY);
+	          }
 	        }
 
 	        function onAnimationProgress(event) {
@@ -35251,7 +35435,7 @@
 	          }
 	        }
 	      }
-	    }
+	    };
 	  }];
 	}];
 
@@ -35277,13 +35461,13 @@
 
 	    var applyAnimationClasses = applyAnimationClassesFactory($$jqLite);
 
-	    return function initDriverFn(animationDetails, onBeforeClassesAppliedCb) {
+	    return function initDriverFn(animationDetails) {
 	      return animationDetails.from && animationDetails.to
 	          ? prepareFromToAnchorAnimation(animationDetails.from,
 	                                         animationDetails.to,
 	                                         animationDetails.classes,
 	                                         animationDetails.anchors)
-	          : prepareRegularAnimation(animationDetails, onBeforeClassesAppliedCb);
+	          : prepareRegularAnimation(animationDetails);
 	    };
 
 	    function filterCssClasses(classes) {
@@ -35479,21 +35663,14 @@
 	      };
 	    }
 
-	    function prepareRegularAnimation(animationDetails, onBeforeClassesAppliedCb) {
+	    function prepareRegularAnimation(animationDetails) {
 	      var element = animationDetails.element;
 	      var options = animationDetails.options || {};
 
-	      // since the ng-EVENT, class-ADD and class-REMOVE classes are applied inside
-	      // of the animateQueue pre and postDigest stages then there is no need to add
-	      // then them here as well.
-	      options.$$skipPreparationClasses = true;
-
-	      // during the pre/post digest stages inside of animateQueue we also performed
-	      // the blocking (transition:-9999s) so there is no point in doing that again.
-	      options.skipBlocking = true;
-
 	      if (animationDetails.structural) {
 	        options.event = animationDetails.event;
+	        options.structural = true;
+	        options.applyClassesEarly = true;
 
 	        // we special case the leave animation since we want to ensure that
 	        // the element is removed as soon as the animation is over. Otherwise
@@ -35502,11 +35679,6 @@
 	          options.onDone = options.domOperation;
 	        }
 	      }
-
-	      // we apply the classes right away since the pre-digest took care of the
-	      // preparation classes.
-	      onBeforeClassesAppliedCb(element);
-	      applyAnimationClasses(element, options);
 
 	      // We assign the preparationClasses as the actual animation event since
 	      // the internals of $animateCss will just suffix the event token values
@@ -35531,8 +35703,8 @@
 	//  by the time...
 
 	var $$AnimateJsProvider = ['$animateProvider', function($animateProvider) {
-	  this.$get = ['$injector', '$$AnimateRunner', '$$rAFMutex', '$$jqLite',
-	       function($injector,   $$AnimateRunner,   $$rAFMutex,   $$jqLite) {
+	  this.$get = ['$injector', '$$AnimateRunner', '$$jqLite',
+	       function($injector,   $$AnimateRunner,   $$jqLite) {
 
 	    var applyAnimationClasses = applyAnimationClassesFactory($$jqLite);
 	         // $animateJs(element, 'enter');
@@ -36227,9 +36399,6 @@
 	        return runner;
 	      }
 
-	      applyGeneratedPreparationClasses(element, isStructural ? event : null, options);
-	      blockTransitions(node, SAFE_FAST_FORWARD_DURATION_VALUE);
-
 	      // the counter keeps track of cancelled animations
 	      var counter = (existingAnimation.counter || 0) + 1;
 	      newAnimation.counter = counter;
@@ -36288,10 +36457,7 @@
 	            : animationDetails.event;
 
 	        markElementAnimationState(element, RUNNING_STATE);
-	        var realRunner = $$animation(element, event, animationDetails.options, function(e) {
-	          $$forceReflow();
-	          blockTransitions(getDomNode(e), false);
-	        });
+	        var realRunner = $$animation(element, event, animationDetails.options);
 
 	        realRunner.done(function(status) {
 	          close(!status);
@@ -36436,19 +36602,34 @@
 	  }];
 	}];
 
-	var $$rAFMutexFactory = ['$$rAF', function($$rAF) {
+	var $$AnimateAsyncRunFactory = ['$$rAF', function($$rAF) {
+	  var waitQueue = [];
+
+	  function waitForTick(fn) {
+	    waitQueue.push(fn);
+	    if (waitQueue.length > 1) return;
+	    $$rAF(function() {
+	      for (var i = 0; i < waitQueue.length; i++) {
+	        waitQueue[i]();
+	      }
+	      waitQueue = [];
+	    });
+	  }
+
 	  return function() {
 	    var passed = false;
-	    $$rAF(function() {
+	    waitForTick(function() {
 	      passed = true;
 	    });
-	    return function(fn) {
-	      passed ? fn() : $$rAF(fn);
+	    return function(callback) {
+	      passed ? callback() : waitForTick(callback);
 	    };
 	  };
 	}];
 
-	var $$AnimateRunnerFactory = ['$q', '$$rAFMutex', function($q, $$rAFMutex) {
+	var $$AnimateRunnerFactory = ['$q', '$sniffer', '$$animateAsyncRun',
+	                      function($q,   $sniffer,   $$animateAsyncRun) {
+
 	  var INITIAL_STATE = 0;
 	  var DONE_PENDING_STATE = 1;
 	  var DONE_COMPLETE_STATE = 2;
@@ -36493,7 +36674,7 @@
 	    this.setHost(host);
 
 	    this._doneCallbacks = [];
-	    this._runInAnimationFrame = $$rAFMutex();
+	    this._runInAnimationFrame = $$animateAsyncRun();
 	    this._state = 0;
 	  }
 
@@ -36605,8 +36786,8 @@
 	    return element.data(RUNNER_STORAGE_KEY);
 	  }
 
-	  this.$get = ['$$jqLite', '$rootScope', '$injector', '$$AnimateRunner', '$$HashMap',
-	       function($$jqLite,   $rootScope,   $injector,   $$AnimateRunner,   $$HashMap) {
+	  this.$get = ['$$jqLite', '$rootScope', '$injector', '$$AnimateRunner', '$$HashMap', '$$rAFScheduler',
+	       function($$jqLite,   $rootScope,   $injector,   $$AnimateRunner,   $$HashMap,   $$rAFScheduler) {
 
 	    var animationQueue = [];
 	    var applyAnimationClasses = applyAnimationClassesFactory($$jqLite);
@@ -36674,11 +36855,11 @@
 	          if (remainingLevelEntries <= 0) {
 	            remainingLevelEntries = nextLevelEntries;
 	            nextLevelEntries = 0;
-	            result = result.concat(row);
+	            result.push(row);
 	            row = [];
 	          }
 	          row.push(entry.fn);
-	          forEach(entry.children, function(childEntry) {
+	          entry.children.forEach(function(childEntry) {
 	            nextLevelEntries++;
 	            queue.push(childEntry);
 	          });
@@ -36686,14 +36867,15 @@
 	        }
 
 	        if (row.length) {
-	          result = result.concat(row);
+	          result.push(row);
 	        }
+
 	        return result;
 	      }
 	    }
 
 	    // TODO(matsko): document the signature in a better way
-	    return function(element, event, options, onBeforeClassesAppliedCb) {
+	    return function(element, event, options) {
 	      options = prepareAnimationOptions(options);
 	      var isStructural = ['enter', 'move', 'leave'].indexOf(event) >= 0;
 
@@ -36745,8 +36927,7 @@
 	          // the element was destroyed early on which removed the runner
 	          // form its storage. This means we can't animate this element
 	          // at all and it already has been closed due to destruction.
-	          var elm = entry.element;
-	          if (getRunner(elm) && getDomNode(elm).parentNode) {
+	          if (getRunner(entry.element)) {
 	            animations.push(entry);
 	          } else {
 	            entry.close();
@@ -36777,7 +36958,7 @@
 	                  : animationEntry.element;
 
 	              if (getRunner(targetElement)) {
-	                var operation = invokeFirstDriver(animationEntry, onBeforeClassesAppliedCb);
+	                var operation = invokeFirstDriver(animationEntry);
 	                if (operation) {
 	                  startAnimationFn = operation.start;
 	                }
@@ -36797,11 +36978,9 @@
 	        });
 
 	        // we need to sort each of the animations in order of parent to child
-	        // relationships. This ensures that the parent to child classes are
-	        // applied at the right time.
-	        forEach(sortAnimations(toBeSortedAnimations), function(triggerAnimation) {
-	          triggerAnimation();
-	        });
+	        // relationships. This ensures that the child classes are applied at the
+	        // right time.
+	        $$rAFScheduler(sortAnimations(toBeSortedAnimations));
 	      });
 
 	      return runner;
@@ -36871,7 +37050,7 @@
 	          var lookupKey = from.animationID.toString();
 	          if (!anchorGroups[lookupKey]) {
 	            var group = anchorGroups[lookupKey] = {
-	              // TODO(matsko): double-check this code
+	              structural: true,
 	              beforeStart: function() {
 	                fromAnimation.beforeStart();
 	                toAnimation.beforeStart();
@@ -36925,7 +37104,7 @@
 	        return matches.join(' ');
 	      }
 
-	      function invokeFirstDriver(animationDetails, onBeforeClassesAppliedCb) {
+	      function invokeFirstDriver(animationDetails) {
 	        // we loop in reverse order since the more general drivers (like CSS and JS)
 	        // may attempt more elements, but custom drivers are more particular
 	        for (var i = drivers.length - 1; i >= 0; i--) {
@@ -36933,7 +37112,7 @@
 	          if (!$injector.has(driverName)) continue; // TODO(matsko): remove this check
 
 	          var factory = $injector.get(driverName);
-	          var driver = factory(animationDetails, onBeforeClassesAppliedCb);
+	          var driver = factory(animationDetails);
 	          if (driver) {
 	            return driver;
 	          }
@@ -36989,7 +37168,8 @@
 	/* global angularAnimateModule: true,
 
 	   $$BodyProvider,
-	   $$rAFMutexFactory,
+	   $$AnimateAsyncRunFactory,
+	   $$rAFSchedulerFactory,
 	   $$AnimateChildrenDirective,
 	   $$AnimateRunnerFactory,
 	   $$AnimateQueueProvider,
@@ -37006,7 +37186,7 @@
 	 * @description
 	 *
 	 * The `ngAnimate` module provides support for CSS-based animations (keyframes and transitions) as well as JavaScript-based animations via
-	 * callback hooks. Animations are not enabled by default, however, by including `ngAnimate` then the animation hooks are enabled for an Angular app.
+	 * callback hooks. Animations are not enabled by default, however, by including `ngAnimate` the animation hooks are enabled for an Angular app.
 	 *
 	 * <div doc-module-components="ngAnimate"></div>
 	 *
@@ -37039,7 +37219,7 @@
 	 * CSS-based animations with ngAnimate are unique since they require no JavaScript code at all. By using a CSS class that we reference between our HTML
 	 * and CSS code we can create an animation that will be picked up by Angular when an the underlying directive performs an operation.
 	 *
-	 * The example below shows how an `enter` animation can be made possible on a element using `ng-if`:
+	 * The example below shows how an `enter` animation can be made possible on an element using `ng-if`:
 	 *
 	 * ```html
 	 * <div ng-if="bool" class="fade">
@@ -37174,8 +37354,8 @@
 	 *   /&#42; this will have a 100ms delay between each successive leave animation &#42;/
 	 *   transition-delay: 0.1s;
 	 *
-	 *   /&#42; in case the stagger doesn't work then the duration value
-	 *    must be set to 0 to avoid an accidental CSS inheritance &#42;/
+	 *   /&#42; As of 1.4.4, this must always be set: it signals ngAnimate
+	 *     to not accidentally inherit a delay property from another CSS class &#42;/
 	 *   transition-duration: 0s;
 	 * }
 	 * .my-animation.ng-enter.ng-enter-active {
@@ -37724,16 +37904,16 @@
 	 * @description
 	 * The ngAnimate `$animate` service documentation is the same for the core `$animate` service.
 	 *
-	 * Click here {@link ng.$animate $animate to learn more about animations with `$animate`}.
+	 * Click here {@link ng.$animate to learn more about animations with `$animate`}.
 	 */
 	angular.module('ngAnimate', [])
 	  .provider('$$body', $$BodyProvider)
 
 	  .directive('ngAnimateChildren', $$AnimateChildrenDirective)
-
-	  .factory('$$rAFMutex', $$rAFMutexFactory)
+	  .factory('$$rAFScheduler', $$rAFSchedulerFactory)
 
 	  .factory('$$AnimateRunner', $$AnimateRunnerFactory)
+	  .factory('$$animateAsyncRun', $$AnimateAsyncRunFactory)
 
 	  .provider('$$animateQueue', $$AnimateQueueProvider)
 	  .provider('$$animation', $$AnimationProvider)
@@ -56577,13 +56757,655 @@
 /* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
+	__webpack_require__(13);
+	module.exports = 'ngTouch';
+
+
+/***/ },
+/* 13 */
+/***/ function(module, exports) {
+
+	/**
+	 * @license AngularJS v1.4.5
+	 * (c) 2010-2015 Google, Inc. http://angularjs.org
+	 * License: MIT
+	 */
+	(function(window, angular, undefined) {'use strict';
+
+	/**
+	 * @ngdoc module
+	 * @name ngTouch
+	 * @description
+	 *
+	 * # ngTouch
+	 *
+	 * The `ngTouch` module provides touch events and other helpers for touch-enabled devices.
+	 * The implementation is based on jQuery Mobile touch event handling
+	 * ([jquerymobile.com](http://jquerymobile.com/)).
+	 *
+	 *
+	 * See {@link ngTouch.$swipe `$swipe`} for usage.
+	 *
+	 * <div doc-module-components="ngTouch"></div>
+	 *
+	 */
+
+	// define ngTouch module
+	/* global -ngTouch */
+	var ngTouch = angular.module('ngTouch', []);
+
+	function nodeName_(element) {
+	  return angular.lowercase(element.nodeName || (element[0] && element[0].nodeName));
+	}
+
+	/* global ngTouch: false */
+
+	    /**
+	     * @ngdoc service
+	     * @name $swipe
+	     *
+	     * @description
+	     * The `$swipe` service is a service that abstracts the messier details of hold-and-drag swipe
+	     * behavior, to make implementing swipe-related directives more convenient.
+	     *
+	     * Requires the {@link ngTouch `ngTouch`} module to be installed.
+	     *
+	     * `$swipe` is used by the `ngSwipeLeft` and `ngSwipeRight` directives in `ngTouch`, and by
+	     * `ngCarousel` in a separate component.
+	     *
+	     * # Usage
+	     * The `$swipe` service is an object with a single method: `bind`. `bind` takes an element
+	     * which is to be watched for swipes, and an object with four handler functions. See the
+	     * documentation for `bind` below.
+	     */
+
+	ngTouch.factory('$swipe', [function() {
+	  // The total distance in any direction before we make the call on swipe vs. scroll.
+	  var MOVE_BUFFER_RADIUS = 10;
+
+	  var POINTER_EVENTS = {
+	    'mouse': {
+	      start: 'mousedown',
+	      move: 'mousemove',
+	      end: 'mouseup'
+	    },
+	    'touch': {
+	      start: 'touchstart',
+	      move: 'touchmove',
+	      end: 'touchend',
+	      cancel: 'touchcancel'
+	    }
+	  };
+
+	  function getCoordinates(event) {
+	    var originalEvent = event.originalEvent || event;
+	    var touches = originalEvent.touches && originalEvent.touches.length ? originalEvent.touches : [originalEvent];
+	    var e = (originalEvent.changedTouches && originalEvent.changedTouches[0]) || touches[0];
+
+	    return {
+	      x: e.clientX,
+	      y: e.clientY
+	    };
+	  }
+
+	  function getEvents(pointerTypes, eventType) {
+	    var res = [];
+	    angular.forEach(pointerTypes, function(pointerType) {
+	      var eventName = POINTER_EVENTS[pointerType][eventType];
+	      if (eventName) {
+	        res.push(eventName);
+	      }
+	    });
+	    return res.join(' ');
+	  }
+
+	  return {
+	    /**
+	     * @ngdoc method
+	     * @name $swipe#bind
+	     *
+	     * @description
+	     * The main method of `$swipe`. It takes an element to be watched for swipe motions, and an
+	     * object containing event handlers.
+	     * The pointer types that should be used can be specified via the optional
+	     * third argument, which is an array of strings `'mouse'` and `'touch'`. By default,
+	     * `$swipe` will listen for `mouse` and `touch` events.
+	     *
+	     * The four events are `start`, `move`, `end`, and `cancel`. `start`, `move`, and `end`
+	     * receive as a parameter a coordinates object of the form `{ x: 150, y: 310 }` and the raw
+	     * `event`. `cancel` receives the raw `event` as its single parameter.
+	     *
+	     * `start` is called on either `mousedown` or `touchstart`. After this event, `$swipe` is
+	     * watching for `touchmove` or `mousemove` events. These events are ignored until the total
+	     * distance moved in either dimension exceeds a small threshold.
+	     *
+	     * Once this threshold is exceeded, either the horizontal or vertical delta is greater.
+	     * - If the horizontal distance is greater, this is a swipe and `move` and `end` events follow.
+	     * - If the vertical distance is greater, this is a scroll, and we let the browser take over.
+	     *   A `cancel` event is sent.
+	     *
+	     * `move` is called on `mousemove` and `touchmove` after the above logic has determined that
+	     * a swipe is in progress.
+	     *
+	     * `end` is called when a swipe is successfully completed with a `touchend` or `mouseup`.
+	     *
+	     * `cancel` is called either on a `touchcancel` from the browser, or when we begin scrolling
+	     * as described above.
+	     *
+	     */
+	    bind: function(element, eventHandlers, pointerTypes) {
+	      // Absolute total movement, used to control swipe vs. scroll.
+	      var totalX, totalY;
+	      // Coordinates of the start position.
+	      var startCoords;
+	      // Last event's position.
+	      var lastPos;
+	      // Whether a swipe is active.
+	      var active = false;
+
+	      pointerTypes = pointerTypes || ['mouse', 'touch'];
+	      element.on(getEvents(pointerTypes, 'start'), function(event) {
+	        startCoords = getCoordinates(event);
+	        active = true;
+	        totalX = 0;
+	        totalY = 0;
+	        lastPos = startCoords;
+	        eventHandlers['start'] && eventHandlers['start'](startCoords, event);
+	      });
+	      var events = getEvents(pointerTypes, 'cancel');
+	      if (events) {
+	        element.on(events, function(event) {
+	          active = false;
+	          eventHandlers['cancel'] && eventHandlers['cancel'](event);
+	        });
+	      }
+
+	      element.on(getEvents(pointerTypes, 'move'), function(event) {
+	        if (!active) return;
+
+	        // Android will send a touchcancel if it thinks we're starting to scroll.
+	        // So when the total distance (+ or - or both) exceeds 10px in either direction,
+	        // we either:
+	        // - On totalX > totalY, we send preventDefault() and treat this as a swipe.
+	        // - On totalY > totalX, we let the browser handle it as a scroll.
+
+	        if (!startCoords) return;
+	        var coords = getCoordinates(event);
+
+	        totalX += Math.abs(coords.x - lastPos.x);
+	        totalY += Math.abs(coords.y - lastPos.y);
+
+	        lastPos = coords;
+
+	        if (totalX < MOVE_BUFFER_RADIUS && totalY < MOVE_BUFFER_RADIUS) {
+	          return;
+	        }
+
+	        // One of totalX or totalY has exceeded the buffer, so decide on swipe vs. scroll.
+	        if (totalY > totalX) {
+	          // Allow native scrolling to take over.
+	          active = false;
+	          eventHandlers['cancel'] && eventHandlers['cancel'](event);
+	          return;
+	        } else {
+	          // Prevent the browser from scrolling.
+	          event.preventDefault();
+	          eventHandlers['move'] && eventHandlers['move'](coords, event);
+	        }
+	      });
+
+	      element.on(getEvents(pointerTypes, 'end'), function(event) {
+	        if (!active) return;
+	        active = false;
+	        eventHandlers['end'] && eventHandlers['end'](getCoordinates(event), event);
+	      });
+	    }
+	  };
+	}]);
+
+	/* global ngTouch: false,
+	  nodeName_: false
+	*/
+
+	/**
+	 * @ngdoc directive
+	 * @name ngClick
+	 *
+	 * @description
+	 * A more powerful replacement for the default ngClick designed to be used on touchscreen
+	 * devices. Most mobile browsers wait about 300ms after a tap-and-release before sending
+	 * the click event. This version handles them immediately, and then prevents the
+	 * following click event from propagating.
+	 *
+	 * Requires the {@link ngTouch `ngTouch`} module to be installed.
+	 *
+	 * This directive can fall back to using an ordinary click event, and so works on desktop
+	 * browsers as well as mobile.
+	 *
+	 * This directive also sets the CSS class `ng-click-active` while the element is being held
+	 * down (by a mouse click or touch) so you can restyle the depressed element if you wish.
+	 *
+	 * @element ANY
+	 * @param {expression} ngClick {@link guide/expression Expression} to evaluate
+	 * upon tap. (Event object is available as `$event`)
+	 *
+	 * @example
+	    <example module="ngClickExample" deps="angular-touch.js">
+	      <file name="index.html">
+	        <button ng-click="count = count + 1" ng-init="count=0">
+	          Increment
+	        </button>
+	        count: {{ count }}
+	      </file>
+	      <file name="script.js">
+	        angular.module('ngClickExample', ['ngTouch']);
+	      </file>
+	    </example>
+	 */
+
+	ngTouch.config(['$provide', function($provide) {
+	  $provide.decorator('ngClickDirective', ['$delegate', function($delegate) {
+	    // drop the default ngClick directive
+	    $delegate.shift();
+	    return $delegate;
+	  }]);
+	}]);
+
+	ngTouch.directive('ngClick', ['$parse', '$timeout', '$rootElement',
+	    function($parse, $timeout, $rootElement) {
+	  var TAP_DURATION = 750; // Shorter than 750ms is a tap, longer is a taphold or drag.
+	  var MOVE_TOLERANCE = 12; // 12px seems to work in most mobile browsers.
+	  var PREVENT_DURATION = 2500; // 2.5 seconds maximum from preventGhostClick call to click
+	  var CLICKBUSTER_THRESHOLD = 25; // 25 pixels in any dimension is the limit for busting clicks.
+
+	  var ACTIVE_CLASS_NAME = 'ng-click-active';
+	  var lastPreventedTime;
+	  var touchCoordinates;
+	  var lastLabelClickCoordinates;
+
+
+	  // TAP EVENTS AND GHOST CLICKS
+	  //
+	  // Why tap events?
+	  // Mobile browsers detect a tap, then wait a moment (usually ~300ms) to see if you're
+	  // double-tapping, and then fire a click event.
+	  //
+	  // This delay sucks and makes mobile apps feel unresponsive.
+	  // So we detect touchstart, touchcancel and touchend ourselves and determine when
+	  // the user has tapped on something.
+	  //
+	  // What happens when the browser then generates a click event?
+	  // The browser, of course, also detects the tap and fires a click after a delay. This results in
+	  // tapping/clicking twice. We do "clickbusting" to prevent it.
+	  //
+	  // How does it work?
+	  // We attach global touchstart and click handlers, that run during the capture (early) phase.
+	  // So the sequence for a tap is:
+	  // - global touchstart: Sets an "allowable region" at the point touched.
+	  // - element's touchstart: Starts a touch
+	  // (- touchcancel ends the touch, no click follows)
+	  // - element's touchend: Determines if the tap is valid (didn't move too far away, didn't hold
+	  //   too long) and fires the user's tap handler. The touchend also calls preventGhostClick().
+	  // - preventGhostClick() removes the allowable region the global touchstart created.
+	  // - The browser generates a click event.
+	  // - The global click handler catches the click, and checks whether it was in an allowable region.
+	  //     - If preventGhostClick was called, the region will have been removed, the click is busted.
+	  //     - If the region is still there, the click proceeds normally. Therefore clicks on links and
+	  //       other elements without ngTap on them work normally.
+	  //
+	  // This is an ugly, terrible hack!
+	  // Yeah, tell me about it. The alternatives are using the slow click events, or making our users
+	  // deal with the ghost clicks, so I consider this the least of evils. Fortunately Angular
+	  // encapsulates this ugly logic away from the user.
+	  //
+	  // Why not just put click handlers on the element?
+	  // We do that too, just to be sure. If the tap event caused the DOM to change,
+	  // it is possible another element is now in that position. To take account for these possibly
+	  // distinct elements, the handlers are global and care only about coordinates.
+
+	  // Checks if the coordinates are close enough to be within the region.
+	  function hit(x1, y1, x2, y2) {
+	    return Math.abs(x1 - x2) < CLICKBUSTER_THRESHOLD && Math.abs(y1 - y2) < CLICKBUSTER_THRESHOLD;
+	  }
+
+	  // Checks a list of allowable regions against a click location.
+	  // Returns true if the click should be allowed.
+	  // Splices out the allowable region from the list after it has been used.
+	  function checkAllowableRegions(touchCoordinates, x, y) {
+	    for (var i = 0; i < touchCoordinates.length; i += 2) {
+	      if (hit(touchCoordinates[i], touchCoordinates[i + 1], x, y)) {
+	        touchCoordinates.splice(i, i + 2);
+	        return true; // allowable region
+	      }
+	    }
+	    return false; // No allowable region; bust it.
+	  }
+
+	  // Global click handler that prevents the click if it's in a bustable zone and preventGhostClick
+	  // was called recently.
+	  function onClick(event) {
+	    if (Date.now() - lastPreventedTime > PREVENT_DURATION) {
+	      return; // Too old.
+	    }
+
+	    var touches = event.touches && event.touches.length ? event.touches : [event];
+	    var x = touches[0].clientX;
+	    var y = touches[0].clientY;
+	    // Work around desktop Webkit quirk where clicking a label will fire two clicks (on the label
+	    // and on the input element). Depending on the exact browser, this second click we don't want
+	    // to bust has either (0,0), negative coordinates, or coordinates equal to triggering label
+	    // click event
+	    if (x < 1 && y < 1) {
+	      return; // offscreen
+	    }
+	    if (lastLabelClickCoordinates &&
+	        lastLabelClickCoordinates[0] === x && lastLabelClickCoordinates[1] === y) {
+	      return; // input click triggered by label click
+	    }
+	    // reset label click coordinates on first subsequent click
+	    if (lastLabelClickCoordinates) {
+	      lastLabelClickCoordinates = null;
+	    }
+	    // remember label click coordinates to prevent click busting of trigger click event on input
+	    if (nodeName_(event.target) === 'label') {
+	      lastLabelClickCoordinates = [x, y];
+	    }
+
+	    // Look for an allowable region containing this click.
+	    // If we find one, that means it was created by touchstart and not removed by
+	    // preventGhostClick, so we don't bust it.
+	    if (checkAllowableRegions(touchCoordinates, x, y)) {
+	      return;
+	    }
+
+	    // If we didn't find an allowable region, bust the click.
+	    event.stopPropagation();
+	    event.preventDefault();
+
+	    // Blur focused form elements
+	    event.target && event.target.blur && event.target.blur();
+	  }
+
+
+	  // Global touchstart handler that creates an allowable region for a click event.
+	  // This allowable region can be removed by preventGhostClick if we want to bust it.
+	  function onTouchStart(event) {
+	    var touches = event.touches && event.touches.length ? event.touches : [event];
+	    var x = touches[0].clientX;
+	    var y = touches[0].clientY;
+	    touchCoordinates.push(x, y);
+
+	    $timeout(function() {
+	      // Remove the allowable region.
+	      for (var i = 0; i < touchCoordinates.length; i += 2) {
+	        if (touchCoordinates[i] == x && touchCoordinates[i + 1] == y) {
+	          touchCoordinates.splice(i, i + 2);
+	          return;
+	        }
+	      }
+	    }, PREVENT_DURATION, false);
+	  }
+
+	  // On the first call, attaches some event handlers. Then whenever it gets called, it creates a
+	  // zone around the touchstart where clicks will get busted.
+	  function preventGhostClick(x, y) {
+	    if (!touchCoordinates) {
+	      $rootElement[0].addEventListener('click', onClick, true);
+	      $rootElement[0].addEventListener('touchstart', onTouchStart, true);
+	      touchCoordinates = [];
+	    }
+
+	    lastPreventedTime = Date.now();
+
+	    checkAllowableRegions(touchCoordinates, x, y);
+	  }
+
+	  // Actual linking function.
+	  return function(scope, element, attr) {
+	    var clickHandler = $parse(attr.ngClick),
+	        tapping = false,
+	        tapElement,  // Used to blur the element after a tap.
+	        startTime,   // Used to check if the tap was held too long.
+	        touchStartX,
+	        touchStartY;
+
+	    function resetState() {
+	      tapping = false;
+	      element.removeClass(ACTIVE_CLASS_NAME);
+	    }
+
+	    element.on('touchstart', function(event) {
+	      tapping = true;
+	      tapElement = event.target ? event.target : event.srcElement; // IE uses srcElement.
+	      // Hack for Safari, which can target text nodes instead of containers.
+	      if (tapElement.nodeType == 3) {
+	        tapElement = tapElement.parentNode;
+	      }
+
+	      element.addClass(ACTIVE_CLASS_NAME);
+
+	      startTime = Date.now();
+
+	      // Use jQuery originalEvent
+	      var originalEvent = event.originalEvent || event;
+	      var touches = originalEvent.touches && originalEvent.touches.length ? originalEvent.touches : [originalEvent];
+	      var e = touches[0];
+	      touchStartX = e.clientX;
+	      touchStartY = e.clientY;
+	    });
+
+	    element.on('touchcancel', function(event) {
+	      resetState();
+	    });
+
+	    element.on('touchend', function(event) {
+	      var diff = Date.now() - startTime;
+
+	      // Use jQuery originalEvent
+	      var originalEvent = event.originalEvent || event;
+	      var touches = (originalEvent.changedTouches && originalEvent.changedTouches.length) ?
+	          originalEvent.changedTouches :
+	          ((originalEvent.touches && originalEvent.touches.length) ? originalEvent.touches : [originalEvent]);
+	      var e = touches[0];
+	      var x = e.clientX;
+	      var y = e.clientY;
+	      var dist = Math.sqrt(Math.pow(x - touchStartX, 2) + Math.pow(y - touchStartY, 2));
+
+	      if (tapping && diff < TAP_DURATION && dist < MOVE_TOLERANCE) {
+	        // Call preventGhostClick so the clickbuster will catch the corresponding click.
+	        preventGhostClick(x, y);
+
+	        // Blur the focused element (the button, probably) before firing the callback.
+	        // This doesn't work perfectly on Android Chrome, but seems to work elsewhere.
+	        // I couldn't get anything to work reliably on Android Chrome.
+	        if (tapElement) {
+	          tapElement.blur();
+	        }
+
+	        if (!angular.isDefined(attr.disabled) || attr.disabled === false) {
+	          element.triggerHandler('click', [event]);
+	        }
+	      }
+
+	      resetState();
+	    });
+
+	    // Hack for iOS Safari's benefit. It goes searching for onclick handlers and is liable to click
+	    // something else nearby.
+	    element.onclick = function(event) { };
+
+	    // Actual click handler.
+	    // There are three different kinds of clicks, only two of which reach this point.
+	    // - On desktop browsers without touch events, their clicks will always come here.
+	    // - On mobile browsers, the simulated "fast" click will call this.
+	    // - But the browser's follow-up slow click will be "busted" before it reaches this handler.
+	    // Therefore it's safe to use this directive on both mobile and desktop.
+	    element.on('click', function(event, touchend) {
+	      scope.$apply(function() {
+	        clickHandler(scope, {$event: (touchend || event)});
+	      });
+	    });
+
+	    element.on('mousedown', function(event) {
+	      element.addClass(ACTIVE_CLASS_NAME);
+	    });
+
+	    element.on('mousemove mouseup', function(event) {
+	      element.removeClass(ACTIVE_CLASS_NAME);
+	    });
+
+	  };
+	}]);
+
+	/* global ngTouch: false */
+
+	/**
+	 * @ngdoc directive
+	 * @name ngSwipeLeft
+	 *
+	 * @description
+	 * Specify custom behavior when an element is swiped to the left on a touchscreen device.
+	 * A leftward swipe is a quick, right-to-left slide of the finger.
+	 * Though ngSwipeLeft is designed for touch-based devices, it will work with a mouse click and drag
+	 * too.
+	 *
+	 * To disable the mouse click and drag functionality, add `ng-swipe-disable-mouse` to
+	 * the `ng-swipe-left` or `ng-swipe-right` DOM Element.
+	 *
+	 * Requires the {@link ngTouch `ngTouch`} module to be installed.
+	 *
+	 * @element ANY
+	 * @param {expression} ngSwipeLeft {@link guide/expression Expression} to evaluate
+	 * upon left swipe. (Event object is available as `$event`)
+	 *
+	 * @example
+	    <example module="ngSwipeLeftExample" deps="angular-touch.js">
+	      <file name="index.html">
+	        <div ng-show="!showActions" ng-swipe-left="showActions = true">
+	          Some list content, like an email in the inbox
+	        </div>
+	        <div ng-show="showActions" ng-swipe-right="showActions = false">
+	          <button ng-click="reply()">Reply</button>
+	          <button ng-click="delete()">Delete</button>
+	        </div>
+	      </file>
+	      <file name="script.js">
+	        angular.module('ngSwipeLeftExample', ['ngTouch']);
+	      </file>
+	    </example>
+	 */
+
+	/**
+	 * @ngdoc directive
+	 * @name ngSwipeRight
+	 *
+	 * @description
+	 * Specify custom behavior when an element is swiped to the right on a touchscreen device.
+	 * A rightward swipe is a quick, left-to-right slide of the finger.
+	 * Though ngSwipeRight is designed for touch-based devices, it will work with a mouse click and drag
+	 * too.
+	 *
+	 * Requires the {@link ngTouch `ngTouch`} module to be installed.
+	 *
+	 * @element ANY
+	 * @param {expression} ngSwipeRight {@link guide/expression Expression} to evaluate
+	 * upon right swipe. (Event object is available as `$event`)
+	 *
+	 * @example
+	    <example module="ngSwipeRightExample" deps="angular-touch.js">
+	      <file name="index.html">
+	        <div ng-show="!showActions" ng-swipe-left="showActions = true">
+	          Some list content, like an email in the inbox
+	        </div>
+	        <div ng-show="showActions" ng-swipe-right="showActions = false">
+	          <button ng-click="reply()">Reply</button>
+	          <button ng-click="delete()">Delete</button>
+	        </div>
+	      </file>
+	      <file name="script.js">
+	        angular.module('ngSwipeRightExample', ['ngTouch']);
+	      </file>
+	    </example>
+	 */
+
+	function makeSwipeDirective(directiveName, direction, eventName) {
+	  ngTouch.directive(directiveName, ['$parse', '$swipe', function($parse, $swipe) {
+	    // The maximum vertical delta for a swipe should be less than 75px.
+	    var MAX_VERTICAL_DISTANCE = 75;
+	    // Vertical distance should not be more than a fraction of the horizontal distance.
+	    var MAX_VERTICAL_RATIO = 0.3;
+	    // At least a 30px lateral motion is necessary for a swipe.
+	    var MIN_HORIZONTAL_DISTANCE = 30;
+
+	    return function(scope, element, attr) {
+	      var swipeHandler = $parse(attr[directiveName]);
+
+	      var startCoords, valid;
+
+	      function validSwipe(coords) {
+	        // Check that it's within the coordinates.
+	        // Absolute vertical distance must be within tolerances.
+	        // Horizontal distance, we take the current X - the starting X.
+	        // This is negative for leftward swipes and positive for rightward swipes.
+	        // After multiplying by the direction (-1 for left, +1 for right), legal swipes
+	        // (ie. same direction as the directive wants) will have a positive delta and
+	        // illegal ones a negative delta.
+	        // Therefore this delta must be positive, and larger than the minimum.
+	        if (!startCoords) return false;
+	        var deltaY = Math.abs(coords.y - startCoords.y);
+	        var deltaX = (coords.x - startCoords.x) * direction;
+	        return valid && // Short circuit for already-invalidated swipes.
+	            deltaY < MAX_VERTICAL_DISTANCE &&
+	            deltaX > 0 &&
+	            deltaX > MIN_HORIZONTAL_DISTANCE &&
+	            deltaY / deltaX < MAX_VERTICAL_RATIO;
+	      }
+
+	      var pointerTypes = ['touch'];
+	      if (!angular.isDefined(attr['ngSwipeDisableMouse'])) {
+	        pointerTypes.push('mouse');
+	      }
+	      $swipe.bind(element, {
+	        'start': function(coords, event) {
+	          startCoords = coords;
+	          valid = true;
+	        },
+	        'cancel': function(event) {
+	          valid = false;
+	        },
+	        'end': function(coords, event) {
+	          if (validSwipe(coords)) {
+	            scope.$apply(function() {
+	              element.triggerHandler(eventName);
+	              swipeHandler(scope, {$event: event});
+	            });
+	          }
+	        }
+	      }, pointerTypes);
+	    };
+	  }]);
+	}
+
+	// Left is negative X-coordinate, right is positive.
+	makeSwipeDirective('ngSwipeLeft', -1, 'swipeleft');
+	makeSwipeDirective('ngSwipeRight', 1, 'swiperight');
+
+
+
+	})(window, window.angular);
+
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(13);
+	var content = __webpack_require__(15);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(15)(content, {});
+	var update = __webpack_require__(17)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -56600,23 +57422,23 @@
 	}
 
 /***/ },
-/* 13 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(14)();
+	exports = module.exports = __webpack_require__(16)();
 	// imports
 	exports.push([module.id, "@import url(https://fonts.googleapis.com/icon?family=Material+Icons);", ""]);
 	exports.push([module.id, "@import url(https://ajax.googleapis.com/ajax/libs/angular_material/0.10.1/angular-material.min.css);", ""]);
 	exports.push([module.id, "@import url(https://fonts.googleapis.com/css?family=RobotoDraft:300,400,500,700,400italic);", ""]);
 
 	// module
-	exports.push([module.id, "p {\n  margin-bottom: 1em; }\n\n.heading {\n  margin-bottom: 0.618em; }\n  .heading.-large, h1 {\n    font-size: 24px;\n    font-weight: bold;\n    line-height: 30px; }\n  .heading.-medium, h2 {\n    font-size: 16px;\n    font-weight: normal;\n    line-height: 20px; }\n  .heading.-small, h3 {\n    font-size: 12px;\n    font-weight: bold;\n    line-height: 13.33333px; }\n  .heading.-smallest {\n    font-size: 10px;\n    font-weight: bold; }\n\nhtml,\nbody {\n  overflow: hidden; }\n\nbody {\n  color: #333;\n  background-color: #eee;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-align-items: stretch;\n      -ms-flex-align: stretch;\n          align-items: stretch;\n  -webkit-justify-content: center;\n      -ms-flex-pack: center;\n          justify-content: center; }\n\n#app {\n  margin: 0;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-direction: column;\n      -ms-flex-direction: column;\n          flex-direction: column;\n  background-color: #fff;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1; }\n  @media (min-width: 768px) {\n    #app {\n      margin: 20px; } }\n\n.container,\nplaylist-container,\nplaylists-container {\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-direction: column;\n      -ms-flex-direction: column;\n          flex-direction: column;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  overflow: hidden; }\n\nplaylists-container md-input-container {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  padding: 2px; }\n  playlists-container md-input-container:not(.md-input-invalid) > md-icon.search {\n    color: #fff; }\n  playlists-container md-input-container .md-input {\n    color: #fff; }\n\nsearch-results md-divider {\n  margin-top: 10px;\n  margin-bottom: 10px; }\n\n.main {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  overflow-y: scroll;\n  -webkit-overflow-scrolling: touch; }\n\n.browser {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1; }\n\n.player {\n  position: relative;\n  z-index: 1;\n  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2); }\n\n.player__content {\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center; }\n\n.player__left {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1; }\n\n.player__right {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1; }\n\n.track-desc {\n  font-weight: bold; }\n\nprogress-bar {\n  display: block;\n  position: relative;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  height: 5px;\n  background-color: pink; }\n\n.slider {\n  position: absolute;\n  width: 100%;\n  z-index: 1;\n  top: -24px;\n  margin-left: 0;\n  margin-right: 0; }\n\n.now-playing {\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  background-color: white;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center; }\n\n.now-playing__content {\n  padding: 20px; }\n\n.now-playing__artist {\n  display: block; }\n\n.now-playing__track {\n  display: block;\n  font-size: 14px; }\n\nmd-icon {\n  height: initial;\n  width: initial; }\n\nmd-icon .material-icons {\n  display: block !important; }\n\n.material-icons.md-18 {\n  font-size: 18px; }\n\n.material-icons.md-24 {\n  font-size: 24px; }\n\n.material-icons.md-36 {\n  font-size: 36px; }\n\n.material-icons.md-48 {\n  font-size: 48px; }\n\n.material-icons.md-dark {\n  color: rgba(0, 0, 0, 0.54); }\n\n.material-icons.md-dark.md-inactive {\n  color: rgba(0, 0, 0, 0.26); }\n\n.material-icons.md-light {\n  color: white; }\n\n.material-icons.md-light.md-inactive {\n  color: rgba(255, 255, 255, 0.3); }\n", ""]);
+	exports.push([module.id, "p {\n  margin-bottom: 1em; }\n\n.heading {\n  margin-bottom: 0.618em; }\n  .heading.-large, h1 {\n    font-size: 24px;\n    font-weight: bold;\n    line-height: 30px; }\n  .heading.-medium, h2 {\n    font-size: 16px;\n    font-weight: normal;\n    line-height: 20px; }\n  .heading.-small, h3 {\n    font-size: 12px;\n    font-weight: bold;\n    line-height: 13.33333px; }\n  .heading.-smallest {\n    font-size: 10px;\n    font-weight: bold; }\n\nhtml,\nbody {\n  overflow: hidden; }\n\n* {\n  -webkit-user-select: none;\n  -webkit-touch-callout: none; }\n\nbody {\n  color: #333;\n  background-color: #eee;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-align-items: stretch;\n      -ms-flex-align: stretch;\n          align-items: stretch;\n  -webkit-justify-content: center;\n      -ms-flex-pack: center;\n          justify-content: center; }\n\n#app {\n  margin: 0;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-direction: column;\n      -ms-flex-direction: column;\n          flex-direction: column;\n  background-color: #fff;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1; }\n  @media (min-width: 768px) {\n    #app {\n      margin: 20px; } }\n\n.container,\nplaylist-container,\nplaylists-container {\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-direction: column;\n      -ms-flex-direction: column;\n          flex-direction: column;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  overflow: hidden; }\n\nplaylists-container md-input-container {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  padding: 2px; }\n  playlists-container md-input-container:not(.md-input-invalid) > md-icon.search {\n    color: #fff; }\n  playlists-container md-input-container .md-input {\n    color: #fff; }\n\nsearch-results md-divider {\n  margin-top: 10px;\n  margin-bottom: 10px; }\n\n.scrollable {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  overflow-y: scroll;\n  -webkit-overflow-scrolling: touch; }\n\n.browser {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1; }\n\n.player {\n  position: relative;\n  z-index: 1;\n  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2); }\n\n.player__content {\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center; }\n\n.player__left {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1; }\n\n.player__right {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1; }\n\n.track-desc {\n  font-weight: bold; }\n\nprogress-bar {\n  display: block;\n  position: relative;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  height: 5px;\n  background-color: pink; }\n\n.slider {\n  position: absolute;\n  width: 100%;\n  z-index: 1;\n  top: -24px;\n  margin-left: 0;\n  margin-right: 0; }\n\n.now-playing {\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  background-color: white;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center; }\n\n.now-playing__content {\n  padding: 20px; }\n\n.now-playing__artist {\n  display: block; }\n\n.now-playing__track {\n  display: block;\n  font-size: 14px; }\n\nmd-icon {\n  height: initial;\n  width: initial; }\n\nmd-icon .material-icons {\n  display: block !important; }\n\n.material-icons.md-18 {\n  font-size: 18px; }\n\n.material-icons.md-24 {\n  font-size: 24px; }\n\n.material-icons.md-36 {\n  font-size: 36px; }\n\n.material-icons.md-48 {\n  font-size: 48px; }\n\n.material-icons.md-dark {\n  color: rgba(0, 0, 0, 0.54); }\n\n.material-icons.md-dark.md-inactive {\n  color: rgba(0, 0, 0, 0.26); }\n\n.material-icons.md-light {\n  color: white; }\n\n.material-icons.md-light.md-inactive {\n  color: rgba(255, 255, 255, 0.3); }\n", ""]);
 
 	// exports
 
 
 /***/ },
-/* 14 */
+/* 16 */
 /***/ function(module, exports) {
 
 	/*
@@ -56672,7 +57494,7 @@
 
 
 /***/ },
-/* 15 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -56897,7 +57719,7 @@
 
 
 /***/ },
-/* 16 */
+/* 18 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -56907,7 +57729,7 @@
 	var host = window.location.host;
 
 	var appUrl = isLocal() ? 'http://' + host : 'http://' + mopidyHost + '/material';
-	var mopidyUrl = isLocal() ? '127.0.0.1:6680' : mopidyHost;
+	var mopidyUrl = '192.168.1.110:6680';
 	console.log(appUrl, mopidyUrl);
 
 	var AppSettings = {
@@ -56919,13 +57741,13 @@
 	};
 
 	function isLocal() {
-	    return hostname === 'localhost';
+	    return hostname === 'localhost' || hostname === '192.168.1.110';
 	}
 
 	module.exports = AppSettings;
 
 /***/ },
-/* 17 */
+/* 19 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -56936,25 +57758,24 @@
 	function OnConfig($locationProvider, AppSettings, SpotifyProvider) {
 	    SpotifyProvider.setClientId(AppSettings.spotifyClientId);
 	    SpotifyProvider.setScope('user-read-private playlist-modify-public playlist-modify-private');
-	    SpotifyProvider.setRedirectUri(AppSettings.appUrl +'/callback.html');
+	    SpotifyProvider.setRedirectUri(AppSettings.appUrl);
 	    SpotifyProvider.setAuthToken(localStorage.getItem('spotify-token'));
-
-
 	}
+
 
 	module.exports = OnConfig;
 
 
 /***/ },
-/* 18 */
+/* 20 */
 /***/ function(module, exports) {
 
 	'use strict';
 
-	function States($urlRouterProvider, $stateProvider) {
+	function States($urlRouterProvider, $stateProvider, SpotifyProvider) {
+	    checkToken()
 
 	    $urlRouterProvider.otherwise('/playlists')
-	    
 
 	    $stateProvider
 	        .state('app', {
@@ -56996,7 +57817,26 @@
 	            url: '/reconnect',
 	            template: '<h1>Mopidy connection error</h1><a ui-sref="app.playlists">reconnect</a>'
 	        });
+
+	    function checkToken() {
+	        console.log('hash', location.hash);
+	        var hash = {};
+	        location.hash.replace(/^#\/?/, '').split('&').forEach(function(kv) {
+	            var spl = kv.indexOf('=');
+	            if (spl != -1) {
+	                hash[kv.substring(0, spl)] = decodeURIComponent(kv.substring(spl + 1));
+	            }
+	        });
+	        
+	        console.log('initial hash', hash);
+	        if (hash.access_token) {
+	            localStorage.setItem('spotify-token', hash.access_token);
+	            SpotifyProvider.setAuthToken(hash.access_token);
+	        }
+	    }
 	}
+
+
 
 	function AppController($scope, mopidy, me) {
 	    $scope.mopidy = mopidy;
@@ -57007,7 +57847,7 @@
 	    return Mopidy.connect();
 	}
 
-	function getMe($q, $window, Spotify) {
+	function getMe($q, $window, $stateParams, Spotify) {
 	    return Spotify.getCurrentUser()
 	        .catch(function() {
 	            return Spotify.login()
@@ -57016,27 +57856,12 @@
 	            return Spotify.getCurrentUser()
 	        })
 	}
-	    // function loginAndlistenForToken() {
-	    //     return $q(function(resolve, reject) {
-	    //         $window.addEventListener("message", function(event) {
-	    //             console.log('got postmessage', event);
-	    //             var hash = JSON.parse(event.data);
-	    //             if (hash.type == 'access_token') {
-	    //                 Spotify.setAuthToken(hash.access_token);
-	    //                 localStorage.setItem('spotify-token', hash.access_token);
-	    //                 resolve(Spotify);
-	    //             }
-	    //             reject();
-	    //         }, false);
-	    //         Spotify.login();
-	    //     });
-	    // }
 
 	module.exports = States;
 
 
 /***/ },
-/* 19 */
+/* 21 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -57044,7 +57869,7 @@
 	/**
 	 * @ngInject
 	 */
-	function OnRun($rootScope, $window, $state, AppSettings) {
+	function OnRun($rootScope, $document, $window, $state, AppSettings) {
 
 	    // change page title based on state
 	    $rootScope.$on('$stateChangeSuccess', function(event, toState) {
@@ -57063,19 +57888,28 @@
 	    });
 
 
+	    $document.on('touchmove', function(e) {
+	        e.preventDefault();
+	    });
+
+
+
+
+
+
 	}
 
 	module.exports = OnRun;
 
 
 /***/ },
-/* 20 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Mopidy = __webpack_require__(21);
-	var _ = __webpack_require__(46);
+	var Mopidy = __webpack_require__(23);
+	var _ = __webpack_require__(48);
 
 	function ConnectMopidy($window, $q, $rootScope, AppSettings) {
 	    var mopidy;
@@ -57131,14 +57965,14 @@
 
 
 /***/ },
-/* 21 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*global module:true, require:false*/
 
-	var bane = __webpack_require__(22);
-	var websocket = __webpack_require__(24);
-	var when = __webpack_require__(25);
+	var bane = __webpack_require__(24);
+	var websocket = __webpack_require__(26);
+	var when = __webpack_require__(27);
 
 	function Mopidy(settings) {
 	    if (!(this instanceof Mopidy)) {
@@ -57472,10 +58306,10 @@
 
 
 /***/ },
-/* 22 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;(("function" === "function" && __webpack_require__(23) && function (m) { !(__WEBPACK_AMD_DEFINE_FACTORY__ = (m), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)); }) ||
+	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;(("function" === "function" && __webpack_require__(25) && function (m) { !(__WEBPACK_AMD_DEFINE_FACTORY__ = (m), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)); }) ||
 	 (typeof module === "object" && function (m) { module.exports = m(); }) ||
 	 function (m) { this.bane = m(); }
 	)(function () {
@@ -57652,7 +58486,7 @@
 
 
 /***/ },
-/* 23 */
+/* 25 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {module.exports = __webpack_amd_options__;
@@ -57660,14 +58494,14 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, {}))
 
 /***/ },
-/* 24 */
+/* 26 */
 /***/ function(module, exports) {
 
 	module.exports = { Client: window.WebSocket };
 
 
 /***/ },
-/* 25 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -57681,24 +58515,24 @@
 	(function(define) { 'use strict';
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 
-		var timed = __webpack_require__(26);
-		var array = __webpack_require__(32);
-		var flow = __webpack_require__(35);
-		var fold = __webpack_require__(36);
-		var inspect = __webpack_require__(37);
-		var generate = __webpack_require__(38);
-		var progress = __webpack_require__(39);
-		var withThis = __webpack_require__(40);
-		var unhandledRejection = __webpack_require__(41);
-		var TimeoutError = __webpack_require__(31);
+		var timed = __webpack_require__(28);
+		var array = __webpack_require__(34);
+		var flow = __webpack_require__(37);
+		var fold = __webpack_require__(38);
+		var inspect = __webpack_require__(39);
+		var generate = __webpack_require__(40);
+		var progress = __webpack_require__(41);
+		var withThis = __webpack_require__(42);
+		var unhandledRejection = __webpack_require__(43);
+		var TimeoutError = __webpack_require__(33);
 
 		var Promise = [array, flow, fold, generate, progress,
 			inspect, withThis, timed, unhandledRejection]
 			.reduce(function(Promise, feature) {
 				return feature(Promise);
-			}, __webpack_require__(43));
+			}, __webpack_require__(45));
 
-		var apply = __webpack_require__(34)(Promise);
+		var apply = __webpack_require__(36)(Promise);
 
 		// Public API
 
@@ -57897,11 +58731,11 @@
 
 		return when;
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	})(__webpack_require__(30));
+	})(__webpack_require__(32));
 
 
 /***/ },
-/* 26 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -57911,8 +58745,8 @@
 	(function(define) { 'use strict';
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
 
-		var env = __webpack_require__(27);
-		var TimeoutError = __webpack_require__(31);
+		var env = __webpack_require__(29);
+		var TimeoutError = __webpack_require__(33);
 
 		function setTimeout(f, ms, x, y) {
 			return env.setTimer(function() {
@@ -57981,11 +58815,11 @@
 		};
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(30)));
+	}(__webpack_require__(32)));
 
 
 /***/ },
-/* 27 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var require;var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(process) {/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -58019,7 +58853,7 @@
 
 		} else if (!capturedSetTimeout) { // vert.x
 			var vertxRequire = require;
-			var vertx = __webpack_require__(29);
+			var vertx = __webpack_require__(31);
 			setTimer = function (f, ms) { return vertx.setTimer(ms, f); };
 			clearTimer = vertx.cancelTimer;
 			asap = vertx.runOnLoop || vertx.runOnContext;
@@ -58060,12 +58894,12 @@
 			};
 		}
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(30)));
+	}(__webpack_require__(32)));
 
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(28)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(30)))
 
 /***/ },
-/* 28 */
+/* 30 */
 /***/ function(module, exports) {
 
 	// shim for using process in browser
@@ -58161,20 +58995,20 @@
 
 
 /***/ },
-/* 29 */
+/* 31 */
 /***/ function(module, exports) {
 
 	/* (ignored) */
 
 /***/ },
-/* 30 */
+/* 32 */
 /***/ function(module, exports) {
 
 	module.exports = function() { throw new Error("define cannot be used indirect"); };
 
 
 /***/ },
-/* 31 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -58203,10 +59037,10 @@
 
 		return TimeoutError;
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(30)));
+	}(__webpack_require__(32)));
 
 /***/ },
-/* 32 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -58216,8 +59050,8 @@
 	(function(define) { 'use strict';
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
 
-		var state = __webpack_require__(33);
-		var applier = __webpack_require__(34);
+		var state = __webpack_require__(35);
+		var applier = __webpack_require__(36);
 
 		return function array(Promise) {
 
@@ -58497,11 +59331,11 @@
 		};
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(30)));
+	}(__webpack_require__(32)));
 
 
 /***/ },
-/* 33 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -58538,11 +59372,11 @@
 		}
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(30)));
+	}(__webpack_require__(32)));
 
 
 /***/ },
-/* 34 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -58597,13 +59431,13 @@
 		}
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(30)));
+	}(__webpack_require__(32)));
 
 
 
 
 /***/ },
-/* 35 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -58765,11 +59599,11 @@
 		}
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(30)));
+	}(__webpack_require__(32)));
 
 
 /***/ },
-/* 36 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -58798,11 +59632,11 @@
 		};
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(30)));
+	}(__webpack_require__(32)));
 
 
 /***/ },
-/* 37 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -58812,7 +59646,7 @@
 	(function(define) { 'use strict';
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
 
-		var inspect = __webpack_require__(33).inspect;
+		var inspect = __webpack_require__(35).inspect;
 
 		return function inspection(Promise) {
 
@@ -58824,11 +59658,11 @@
 		};
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(30)));
+	}(__webpack_require__(32)));
 
 
 /***/ },
-/* 38 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -58895,11 +59729,11 @@
 		};
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(30)));
+	}(__webpack_require__(32)));
 
 
 /***/ },
-/* 39 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -58925,11 +59759,11 @@
 		};
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(30)));
+	}(__webpack_require__(32)));
 
 
 /***/ },
-/* 40 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -58968,12 +59802,12 @@
 		};
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(30)));
+	}(__webpack_require__(32)));
 
 
 
 /***/ },
-/* 41 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -58983,8 +59817,8 @@
 	(function(define) { 'use strict';
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
 
-		var setTimer = __webpack_require__(27).setTimer;
-		var format = __webpack_require__(42);
+		var setTimer = __webpack_require__(29).setTimer;
+		var format = __webpack_require__(44);
 
 		return function unhandledRejection(Promise) {
 
@@ -59061,11 +59895,11 @@
 		function noop() {}
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(30)));
+	}(__webpack_require__(32)));
 
 
 /***/ },
-/* 42 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -59123,11 +59957,11 @@
 		}
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(30)));
+	}(__webpack_require__(32)));
 
 
 /***/ },
-/* 43 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -59137,20 +59971,20 @@
 	(function(define) { 'use strict';
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 
-		var makePromise = __webpack_require__(44);
-		var Scheduler = __webpack_require__(45);
-		var async = __webpack_require__(27).asap;
+		var makePromise = __webpack_require__(46);
+		var Scheduler = __webpack_require__(47);
+		var async = __webpack_require__(29).asap;
 
 		return makePromise({
 			scheduler: new Scheduler(async)
 		});
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	})(__webpack_require__(30));
+	})(__webpack_require__(32));
 
 
 /***/ },
-/* 44 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(process) {/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -60079,12 +60913,12 @@
 			return Promise;
 		};
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(30)));
+	}(__webpack_require__(32)));
 
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(28)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(30)))
 
 /***/ },
-/* 45 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -60166,11 +61000,11 @@
 		return Scheduler;
 
 	}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}(__webpack_require__(30)));
+	}(__webpack_require__(32)));
 
 
 /***/ },
-/* 46 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {/**
@@ -72525,10 +73359,10 @@
 	  }
 	}.call(this));
 
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(47)(module), (function() { return this; }())))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(49)(module), (function() { return this; }())))
 
 /***/ },
-/* 47 */
+/* 49 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -72544,7 +73378,7 @@
 
 
 /***/ },
-/* 48 */
+/* 50 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -72569,7 +73403,42 @@
 	module.exports = Util;
 
 /***/ },
-/* 49 */
+/* 51 */
+/***/ function(module, exports) {
+
+	'use strict'
+
+	function Scrollable($state, Mopidy) {
+	    return {
+	        restrict: 'A',
+	        link: function($scope, $el) {
+	            var el = $el[0];
+	            $el.on('touchstart', function() {
+
+	                var top = el.scrollTop,
+	                    totalScroll = el.scrollHeight,
+	                    currentScroll = top + el.offsetHeight;
+
+	                if (top === 0) {
+	                    el.scrollTop = 1;
+	                } else if (currentScroll === totalScroll) {
+	                    el.scrollTop = top - 1;
+	                }
+
+	            });
+	            $el.on('touchmove', function(e) {
+	               e.stopPropagation();
+	            });
+	        }
+
+	    }
+	}
+
+	module.exports = Scrollable
+
+
+/***/ },
+/* 52 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -72590,12 +73459,12 @@
 
 
 /***/ },
-/* 50 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var template = __webpack_require__(51);
+	var template = __webpack_require__(54);
 
 	function Player($rootScope, $interval, Util, Spotify, AppSettings, Mopidy, hotkeys) {
 	    return {
@@ -72809,7 +73678,7 @@
 	module.exports = Player;
 
 /***/ },
-/* 51 */
+/* 54 */
 /***/ function(module, exports) {
 
 	var path = 'player/player.html';
@@ -72817,12 +73686,12 @@
 	module.exports = path;
 
 /***/ },
-/* 52 */
+/* 55 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var template = __webpack_require__(53)
+	var template = __webpack_require__(56)
 
 	function searchResults($state, Mopidy) {
 	    return {
@@ -72852,7 +73721,7 @@
 	module.exports = searchResults;
 
 /***/ },
-/* 53 */
+/* 56 */
 /***/ function(module, exports) {
 
 	var path = 'searchResults/searchResults.html';
@@ -72860,12 +73729,12 @@
 	module.exports = path;
 
 /***/ },
-/* 54 */
+/* 57 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var template = __webpack_require__(55)
+	var template = __webpack_require__(58)
 
 	function PlaylistsContainer($state, Mopidy) {
 	    return {
@@ -72896,20 +73765,20 @@
 	module.exports = PlaylistsContainer;
 
 /***/ },
-/* 55 */
+/* 58 */
 /***/ function(module, exports) {
 
 	var path = 'playlists/container.html';
-	window.angular.module('ng').run(['$templateCache', function(c) { c.put(path, "<playlists-toolbar on-clear-search=\"clearResults()\" on-search=\"search(term)\"></playlists-toolbar>\n<playlists class=\"main\" ng-if=\"!results\"></playlists>\n<search-results class=\"main\" ng-if=\"results\" results=\"results\"></search-results>") }]);
+	window.angular.module('ng').run(['$templateCache', function(c) { c.put(path, "<playlists-toolbar on-clear-search=\"clearResults()\" on-search=\"search(term)\"></playlists-toolbar>\n<playlists class=\"scrollable\" scrollable ng-if=\"!results\"></playlists>\n<search-results class=\"scrollable\" scrollable ng-if=\"results\" results=\"results\"></search-results>") }]);
 	module.exports = path;
 
 /***/ },
-/* 56 */
+/* 59 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var template = __webpack_require__(57)
+	var template = __webpack_require__(60)
 
 	function Playlists($state, Mopidy) {
 	    return {
@@ -72946,7 +73815,7 @@
 	module.exports = Playlists;
 
 /***/ },
-/* 57 */
+/* 60 */
 /***/ function(module, exports) {
 
 	var path = 'playlists/playlists.html';
@@ -72954,12 +73823,12 @@
 	module.exports = path;
 
 /***/ },
-/* 58 */
+/* 61 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var template = __webpack_require__(59)
+	var template = __webpack_require__(62)
 
 	function PlaylistsToolbar($state, Mopidy) {
 	    return {
@@ -72988,7 +73857,7 @@
 	module.exports = PlaylistsToolbar;
 
 /***/ },
-/* 59 */
+/* 62 */
 /***/ function(module, exports) {
 
 	var path = 'playlists/toolbar.html';
@@ -72996,12 +73865,12 @@
 	module.exports = path;
 
 /***/ },
-/* 60 */
+/* 63 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var template = __webpack_require__(61)
+	var template = __webpack_require__(64)
 
 	function PlaylistContainer($state, Mopidy) {
 	    return {
@@ -73026,20 +73895,20 @@
 	module.exports = PlaylistContainer;
 
 /***/ },
-/* 61 */
+/* 64 */
 /***/ function(module, exports) {
 
 	var path = 'playlist/container.html';
-	window.angular.module('ng').run(['$templateCache', function(c) { c.put(path, "<playlist-toolbar on-play-all=\"playAll()\"></playlist-toolbar>\n<playlist class=\"main\" uri=\"{{ uri }}\"></playlist>") }]);
+	window.angular.module('ng').run(['$templateCache', function(c) { c.put(path, "<playlist-toolbar on-play-all=\"playAll()\"></playlist-toolbar>\n<playlist class=\"scrollable\" uri=\"{{ uri }}\" scrollable></playlist>") }]);
 	module.exports = path;
 
 /***/ },
-/* 62 */
+/* 65 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
 
-	var template = __webpack_require__(63)
+	var template = __webpack_require__(66)
 
 	function Playlist($state, Mopidy) {
 	    return {
@@ -73078,7 +73947,7 @@
 	module.exports = Playlist
 
 /***/ },
-/* 63 */
+/* 66 */
 /***/ function(module, exports) {
 
 	var path = 'playlist/playlist.html';
@@ -73086,12 +73955,12 @@
 	module.exports = path;
 
 /***/ },
-/* 64 */
+/* 67 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
 
-	var template = __webpack_require__(65)
+	var template = __webpack_require__(68)
 
 	function PlaylistToolbar($state, Mopidy) {
 	    return {
@@ -73113,7 +73982,7 @@
 	module.exports = PlaylistToolbar
 
 /***/ },
-/* 65 */
+/* 68 */
 /***/ function(module, exports) {
 
 	var path = 'playlist/toolbar.html';
@@ -73121,12 +73990,12 @@
 	module.exports = path;
 
 /***/ },
-/* 66 */
+/* 69 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var template = __webpack_require__(67)
+	var template = __webpack_require__(70)
 
 	function Settings() {
 	    return {
@@ -73141,7 +74010,7 @@
 	module.exports = Settings;
 
 /***/ },
-/* 67 */
+/* 70 */
 /***/ function(module, exports) {
 
 	var path = 'settings/settings.html';
@@ -73149,12 +74018,12 @@
 	module.exports = path;
 
 /***/ },
-/* 68 */
+/* 71 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var template = __webpack_require__(69)
+	var template = __webpack_require__(72)
 
 	function Toolbar() {
 	    return {
@@ -73167,7 +74036,7 @@
 	module.exports = Toolbar;
 
 /***/ },
-/* 69 */
+/* 72 */
 /***/ function(module, exports) {
 
 	var path = 'toolbar/toolbar.html';

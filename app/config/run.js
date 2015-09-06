@@ -3,7 +3,7 @@
 /**
  * @ngInject
  */
-function OnRun($rootScope, $window, $state, AppSettings) {
+function OnRun($rootScope, $document, $window, $state, AppSettings) {
 
     // change page title based on state
     $rootScope.$on('$stateChangeSuccess', function(event, toState) {
@@ -20,6 +20,15 @@ function OnRun($rootScope, $window, $state, AppSettings) {
     $rootScope.$on('$stateChangeError', function(event, toState) {
         $state.go('reconnect');
     });
+
+
+    $document.on('touchmove', function(e) {
+        e.preventDefault();
+    });
+
+
+
+
 
 
 }

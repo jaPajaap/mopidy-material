@@ -1,9 +1,9 @@
 'use strict';
 
-function States($urlRouterProvider, $stateProvider) {
+function States($urlRouterProvider, $stateProvider, SpotifyProvider) {
+    checkToken()
 
     $urlRouterProvider.otherwise('/playlists')
-    
 
     $stateProvider
         .state('app', {
@@ -45,7 +45,26 @@ function States($urlRouterProvider, $stateProvider) {
             url: '/reconnect',
             template: '<h1>Mopidy connection error</h1><a ui-sref="app.playlists">reconnect</a>'
         });
+
+    function checkToken() {
+        console.log('hash', location.hash);
+        var hash = {};
+        location.hash.replace(/^#\/?/, '').split('&').forEach(function(kv) {
+            var spl = kv.indexOf('=');
+            if (spl != -1) {
+                hash[kv.substring(0, spl)] = decodeURIComponent(kv.substring(spl + 1));
+            }
+        });
+        
+        console.log('initial hash', hash);
+        if (hash.access_token) {
+            localStorage.setItem('spotify-token', hash.access_token);
+            SpotifyProvider.setAuthToken(hash.access_token);
+        }
+    }
 }
+
+
 
 function AppController($scope, mopidy, me) {
     $scope.mopidy = mopidy;
@@ -56,7 +75,7 @@ function getMopidy(Mopidy) {
     return Mopidy.connect();
 }
 
-function getMe($q, $window, Spotify) {
+function getMe($q, $window, $stateParams, Spotify) {
     return Spotify.getCurrentUser()
         .catch(function() {
             return Spotify.login()
@@ -65,20 +84,5 @@ function getMe($q, $window, Spotify) {
             return Spotify.getCurrentUser()
         })
 }
-    // function loginAndlistenForToken() {
-    //     return $q(function(resolve, reject) {
-    //         $window.addEventListener("message", function(event) {
-    //             console.log('got postmessage', event);
-    //             var hash = JSON.parse(event.data);
-    //             if (hash.type == 'access_token') {
-    //                 Spotify.setAuthToken(hash.access_token);
-    //                 localStorage.setItem('spotify-token', hash.access_token);
-    //                 resolve(Spotify);
-    //             }
-    //             reject();
-    //         }, false);
-    //         Spotify.login();
-    //     });
-    // }
 
 module.exports = States;

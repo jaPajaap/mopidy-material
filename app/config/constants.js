@@ -5,7 +5,7 @@ var hostname = window.location.hostname;
 var host = window.location.host;
 
 var appUrl = isLocal() ? 'http://' + host : 'http://' + mopidyHost + '/material';
-var mopidyUrl = isLocal() ? '127.0.0.1:6680' : mopidyHost;
+var mopidyUrl = mopidyHost;
 console.log(appUrl, mopidyUrl);
 
 var AppSettings = {
@@ -17,7 +17,7 @@ var AppSettings = {
 };
 
 function isLocal() {
-    return hostname === 'localhost';
+    return hostname === 'localhost' || hostname === '192.168.1.110';
 }
 
 module.exports = AppSettings;
