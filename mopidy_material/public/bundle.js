@@ -33588,6 +33588,7 @@
 	            };
 
 	            var url = 'https://accounts.spotify.com/authorize?' + this.toQueryString(params);
+	            debugger;
 	            $window.location = url;
 	            return;
 	          }
