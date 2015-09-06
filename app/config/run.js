@@ -6,7 +6,7 @@
 function OnRun($rootScope, $document, $window, $state, AppSettings) {
 
     // change page title based on state
-    $rootScope.$on('$stateChangeSuccess', function(event, toState) {
+    $rootScope.$on('$stateChangeSuccess', function(e, toState) {
         $rootScope.pageTitle = '';
 
         if (toState.title) {
@@ -17,7 +17,8 @@ function OnRun($rootScope, $document, $window, $state, AppSettings) {
         $rootScope.pageTitle += AppSettings.appTitle;
     });
 
-    $rootScope.$on('$stateChangeError', function(event, toState) {
+    $rootScope.$on('$stateChangeError', function(e, toState) {
+        console.log(e)
         $state.go('reconnect');
     });
 

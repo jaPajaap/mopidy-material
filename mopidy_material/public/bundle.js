@@ -57683,7 +57683,7 @@
 	var hostname = window.location.hostname;
 	var host = window.location.host;
 
-	var appUrl = isLocal() ? 'http://' + host : 'http://' + mopidyHost + '/material';
+	var appUrl = isLocal() ? 'http://' + host : 'http://' + mopidyHost + '/material/';
 	var mopidyUrl = mopidyHost;
 	console.log(appUrl, mopidyUrl);
 
@@ -57826,7 +57826,7 @@
 	function OnRun($rootScope, $document, $window, $state, AppSettings) {
 
 	    // change page title based on state
-	    $rootScope.$on('$stateChangeSuccess', function(event, toState) {
+	    $rootScope.$on('$stateChangeSuccess', function(e, toState) {
 	        $rootScope.pageTitle = '';
 
 	        if (toState.title) {
@@ -57837,7 +57837,8 @@
 	        $rootScope.pageTitle += AppSettings.appTitle;
 	    });
 
-	    $rootScope.$on('$stateChangeError', function(event, toState) {
+	    $rootScope.$on('$stateChangeError', function(e, toState) {
+	        console.log(e)
 	        $state.go('reconnect');
 	    });
 
