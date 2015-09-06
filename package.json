@@ -34,7 +34,7 @@
     "angular-aria": "^1.4.3",
     "angular-hotkeys": "^1.5.0",
     "angular-material": "^0.10.0",
-    "angular-spotify": "^1.1.0",
+    "angular-spotify": "https://github.com/jaPajaap/angular-spotify.git",
     "angular-touch": "^1.4.5",
     "angular-ui-router": "^0.2.15",
     "include-media": "^1.4.1",
