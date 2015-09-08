@@ -2,7 +2,6 @@
 
 function States($urlRouterProvider, $stateProvider, SpotifyProvider) {
     $urlRouterProvider.otherwise(function($injector, $location) {
-        console.log('hash', location.hash);
         var hash = {};
         location.hash.replace(/^#\/?/, '').split('&').forEach(function(kv) {
             var spl = kv.indexOf('=');
@@ -11,9 +10,6 @@ function States($urlRouterProvider, $stateProvider, SpotifyProvider) {
             }
         });
         
-        console.log('initial hash', hash);
-        
-        debugger;
         if (hash.access_token) {
             localStorage.setItem('spotify-token', hash.access_token);
             SpotifyProvider.setAuthToken(hash.access_token);

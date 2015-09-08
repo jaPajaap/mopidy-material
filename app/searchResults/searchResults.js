@@ -10,6 +10,10 @@ function searchResults($state, Mopidy) {
             results: '='
         },
         controller: function($scope) {
+            $scope.searchTypes = ['artists', 'albums', 'tracks'];
+            $scope.noresults = function() {
+                return !$scope.results[$scope.searchTypes[0]] && !$scope.results[$scope.searchTypes[1]] && !$scope.results[$scope.searchTypes[2]]
+            }
             $scope.addAndPlay = addAndPlay;
             $scope.showPlaylist = showPlaylist;
             

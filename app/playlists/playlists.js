@@ -6,19 +6,13 @@ function Playlists($state, Mopidy) {
     return {
         restrict: 'E',
         templateUrl: template,
+        scope: {
+            playlists: '='
+        },
         controller: function($scope) {
-            $scope.playlists = [];
             $scope.addAndPlay = addAndPlay;
             $scope.showPlaylist = showPlaylist;
-            
-            getPlaylists();
 
-            function getPlaylists() {
-                return Mopidy.execute('playlists.getPlaylists')
-                .then(function setPlaylists(playlists) {
-                    $scope.playlists = playlists;
-                });
-            }
             function addAndPlay (uri) {    
                 return Mopidy.execute('tracklist.clear')
                 .then(Mopidy.execute('tracklist.add', {uri: uri}))

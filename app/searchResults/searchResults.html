@@ -1,25 +1,11 @@
 <md-list>
-    <md-subheader class="md-no-sticky">Artists</md-subheader>
-    <md-list-item class="md-with-secondary--hover" ng-repeat="artist in results.artists | limitTo: 3" ng-click="showPlaylist(artist.uri)">
-        <p>{{ artist.name }}</p>
-        <md-icon class="md-secondary material-icons" ng-click="addAndPlay(artist.uri)">play_arrow</md-icon>
+    <md-subheader class="md-warn" ng-if="noresults()">No results</md-subheader>
+    <md-subheader class="md-no-sticky" ng-if="!noresults()" ng-repeat-start="type in searchTypes">{{ type }}</md-subheader>
+    <md-list-item class="md-with-secondary--hover" ng-repeat="result in results[type] | limitTo: 3" ng-click="showPlaylist(result.uri)">
+        <p>{{ result.name }}</p>
+        <md-icon class="md-secondary material-icons" ng-click="addAndPlay(result.uri)">play_arrow</md-icon>
     </md-list-item>
     
-    <md-divider></md-divider>
-
-    <md-subheader class="md-no-sticky">Albums</md-subheader>
-    <md-list-item class="md-with-secondary--hover" ng-repeat="album in results.albums | limitTo: 3" ng-click="showPlaylist(album.uri)">
-        <p>{{ album.name }}</p>
-        <md-icon class="md-secondary material-icons" ng-click="addAndPlay(album.uri)">play_arrow</md-icon>
-    </md-list-item>
-
-    <md-divider></md-divider>
-
-    <md-subheader class="md-no-sticky">Tracks</md-subheader>
-    <md-list-item class="md-with-secondary--hover" ng-repeat="track in results.tracks | limitTo: 10" ng-click="showPlaylist(track.uri)">
-        <p>{{ track.name }}</p>
-        <md-icon class="md-secondary material-icons" ng-click="addAndPlay(track.uri)">play_arrow</md-icon>
-    </md-list-item>
-    
+    <md-divider ng-repeat-end></md-divider>
 
 </md-list>

@@ -24,6 +24,8 @@ function Player($rootScope, $interval, Util, Spotify, AppSettings, Mopidy, hotke
 
             $scope.trackLength;
 
+            $scope.seek = seek;
+
             $rootScope.$on('mopidy:event:playbackStateChanged', handlePlaybackStateChange)
             $rootScope.$on('mopidy:event:trackPlaybackStarted', handleTrackPlaybackStarted)
             $rootScope.$on('mopidy:event:trackPlaybackResumed', handleTrackPlaybackResumed)
@@ -121,16 +123,12 @@ function Player($rootScope, $interval, Util, Spotify, AppSettings, Mopidy, hotke
                 }
             }
 
-            $scope.$watch('currentTimePosition', seek);
-
-            function seek(n, o) {
-                // TODO: check logic
-                if(n > o + 5 || n < o - 5) {
-                    stopCheckingTimePosition()
-                    var timePosition = n / 100 * $scope.track.length
-                    return Mopidy.execute('playback.seek', {time_position: timePosition})
-                        .then(startCheckingTimePosition);
-                }
+            function seek() {
+                // TODO throttle or catch changeEnd event
+                stopCheckingTimePosition();
+                var timePosition = $scope.currentTimePosition / 100 * $scope.track.length
+                return Mopidy.execute('playback.seek', {time_position: timePosition})
+                    .then(startCheckingTimePosition);
                 
             }
 

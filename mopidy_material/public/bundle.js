@@ -57387,7 +57387,7 @@
 	exports.push([module.id, "@import url(https://fonts.googleapis.com/css?family=RobotoDraft:300,400,500,700,400italic);", ""]);
 
 	// module
-	exports.push([module.id, "p {\n  margin-bottom: 1em; }\n\n.heading {\n  margin-bottom: 0.618em; }\n  .heading.-large, h1 {\n    font-size: 24px;\n    font-weight: bold;\n    line-height: 30px; }\n  .heading.-medium, h2 {\n    font-size: 16px;\n    font-weight: normal;\n    line-height: 20px; }\n  .heading.-small, h3 {\n    font-size: 12px;\n    font-weight: bold;\n    line-height: 13.33333px; }\n  .heading.-smallest {\n    font-size: 10px;\n    font-weight: bold; }\n\nhtml,\nbody {\n  overflow: hidden; }\n\n*:not(input):not(textarea) {\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none; }\n\n* {\n  -webkit-touch-callout: none; }\n\nbody {\n  color: #333;\n  background-color: #eee;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-align-items: stretch;\n      -ms-flex-align: stretch;\n          align-items: stretch;\n  -webkit-justify-content: center;\n      -ms-flex-pack: center;\n          justify-content: center; }\n\n#app {\n  margin: 0;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-direction: column;\n      -ms-flex-direction: column;\n          flex-direction: column;\n  background-color: #fff;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1; }\n  @media (min-width: 768px) {\n    #app {\n      margin: 20px; } }\n\n.container,\nplaylist-container,\nplaylists-container {\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-direction: column;\n      -ms-flex-direction: column;\n          flex-direction: column;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  overflow: hidden; }\n\nplaylists-container md-input-container {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  padding: 2px; }\n  playlists-container md-input-container:not(.md-input-invalid) > md-icon.search {\n    color: #fff; }\n  playlists-container md-input-container .md-input {\n    color: #fff; }\n\nsearch-results md-divider {\n  margin-top: 10px;\n  margin-bottom: 10px; }\n\n.scrollable {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  overflow-y: scroll;\n  -webkit-overflow-scrolling: touch; }\n\n.browser {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1; }\n\n.player {\n  position: relative;\n  z-index: 1;\n  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2); }\n\n.player__content {\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center; }\n\n.player__left {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1; }\n\n.player__right {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1; }\n\n.track-desc {\n  font-weight: bold; }\n\nprogress-bar {\n  display: block;\n  position: relative;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  height: 5px;\n  background-color: pink; }\n\n.slider {\n  position: absolute;\n  width: 100%;\n  z-index: 1;\n  top: -24px;\n  margin-left: 0;\n  margin-right: 0; }\n\n.now-playing {\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  background-color: white;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center; }\n\n.now-playing__content {\n  padding: 20px; }\n\n.now-playing__artist {\n  display: block; }\n\n.now-playing__track {\n  display: block;\n  font-size: 14px; }\n\nmd-icon {\n  height: initial;\n  width: initial; }\n\nmd-icon .material-icons {\n  display: block !important; }\n\n.material-icons.md-18 {\n  font-size: 18px; }\n\n.material-icons.md-24 {\n  font-size: 24px; }\n\n.material-icons.md-36 {\n  font-size: 36px; }\n\n.material-icons.md-48 {\n  font-size: 48px; }\n\n.material-icons.md-dark {\n  color: rgba(0, 0, 0, 0.54); }\n\n.material-icons.md-dark.md-inactive {\n  color: rgba(0, 0, 0, 0.26); }\n\n.material-icons.md-light {\n  color: white; }\n\n.material-icons.md-light.md-inactive {\n  color: rgba(255, 255, 255, 0.3); }\n", ""]);
+	exports.push([module.id, "p {\n  margin-bottom: 1em; }\n\n.heading {\n  margin-bottom: 0.618em; }\n  .heading.-large, h1 {\n    font-size: 24px;\n    font-weight: bold;\n    line-height: 30px; }\n  .heading.-medium, h2 {\n    font-size: 16px;\n    font-weight: normal;\n    line-height: 20px; }\n  .heading.-small, h3 {\n    font-size: 12px;\n    font-weight: bold;\n    line-height: 13.33333px; }\n  .heading.-smallest {\n    font-size: 10px;\n    font-weight: bold; }\n\nhtml,\nbody {\n  overflow: hidden; }\n\n*:not(input):not(textarea) {\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none; }\n\n* {\n  -webkit-touch-callout: none; }\n\nbody {\n  color: #333;\n  background-color: #eee;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-align-items: stretch;\n      -ms-flex-align: stretch;\n          align-items: stretch;\n  -webkit-justify-content: center;\n      -ms-flex-pack: center;\n          justify-content: center; }\n\n#app {\n  margin: 0;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-direction: column;\n      -ms-flex-direction: column;\n          flex-direction: column;\n  background-color: #fff;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1; }\n  @media (min-width: 768px) {\n    #app {\n      margin: 20px; } }\n\n.container,\nplaylist-container,\nplaylists-container {\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-direction: column;\n      -ms-flex-direction: column;\n          flex-direction: column;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  overflow: hidden; }\n\nplaylists-container md-input-container {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  padding: 2px; }\n  playlists-container md-input-container:not(.md-input-invalid) > md-icon.search {\n    color: #fff; }\n  playlists-container md-input-container .md-input {\n    color: #fff; }\n\nsearch-results md-divider {\n  margin-top: 10px;\n  margin-bottom: 10px; }\n\n.scrollable {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  overflow-y: scroll;\n  -webkit-overflow-scrolling: touch; }\n\n.browser {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1; }\n\n.player {\n  position: relative;\n  z-index: 1;\n  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2); }\n\n.player__content {\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center; }\n\n.player__left {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1; }\n\n.player__right {\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1; }\n\n.track-desc {\n  font-weight: bold; }\n\nprogress-bar {\n  display: block;\n  position: relative;\n  -webkit-flex: 1;\n      -ms-flex: 1;\n          flex: 1;\n  height: 5px;\n  background-color: pink; }\n\n.slider {\n  position: absolute;\n  width: 100%;\n  z-index: 1;\n  top: -24px;\n  margin-left: 0;\n  margin-right: 0; }\n\n.now-playing {\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  background-color: white;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center; }\n\n.now-playing__content {\n  padding: 20px; }\n\n.now-playing__artist {\n  display: block; }\n\n.now-playing__track {\n  display: block;\n  font-size: 14px; }\n\nmd-icon {\n  height: initial;\n  width: initial; }\n\nmd-icon .material-icons {\n  display: block !important; }\n\n.material-icons.md-18 {\n  font-size: 18px; }\n\n.material-icons.md-24 {\n  font-size: 24px; }\n\n.material-icons.md-36 {\n  font-size: 36px; }\n\n.material-icons.md-48 {\n  font-size: 48px; }\n\n.material-icons.md-dark {\n  color: rgba(0, 0, 0, 0.54); }\n\n.material-icons.md-dark.md-inactive {\n  color: rgba(0, 0, 0, 0.26); }\n\n.material-icons.md-light {\n  color: white; }\n\n.material-icons.md-light.md-inactive {\n  color: rgba(255, 255, 255, 0.3); }\n\n.md-transform-top-left {\n  -webkit-transform-origin: top left;\n          transform-origin: top left; }\n", ""]);
 
 	// exports
 
@@ -57729,7 +57729,6 @@
 
 	function States($urlRouterProvider, $stateProvider, SpotifyProvider) {
 	    $urlRouterProvider.otherwise(function($injector, $location) {
-	        console.log('hash', location.hash);
 	        var hash = {};
 	        location.hash.replace(/^#\/?/, '').split('&').forEach(function(kv) {
 	            var spl = kv.indexOf('=');
@@ -57738,9 +57737,6 @@
 	            }
 	        });
 	        
-	        console.log('initial hash', hash);
-	        
-	        debugger;
 	        if (hash.access_token) {
 	            localStorage.setItem('spotify-token', hash.access_token);
 	            SpotifyProvider.setAuthToken(hash.access_token);
@@ -73443,6 +73439,8 @@
 
 	            $scope.trackLength;
 
+	            $scope.seek = seek;
+
 	            $rootScope.$on('mopidy:event:playbackStateChanged', handlePlaybackStateChange)
 	            $rootScope.$on('mopidy:event:trackPlaybackStarted', handleTrackPlaybackStarted)
 	            $rootScope.$on('mopidy:event:trackPlaybackResumed', handleTrackPlaybackResumed)
@@ -73540,16 +73538,12 @@
 	                }
 	            }
 
-	            $scope.$watch('currentTimePosition', seek);
-
-	            function seek(n, o) {
-	                // TODO: check logic
-	                if(n > o + 5 || n < o - 5) {
-	                    stopCheckingTimePosition()
-	                    var timePosition = n / 100 * $scope.track.length
-	                    return Mopidy.execute('playback.seek', {time_position: timePosition})
-	                        .then(startCheckingTimePosition);
-	                }
+	            function seek() {
+	                // TODO throttle or catch changeEnd event
+	                stopCheckingTimePosition();
+	                var timePosition = $scope.currentTimePosition / 100 * $scope.track.length
+	                return Mopidy.execute('playback.seek', {time_position: timePosition})
+	                    .then(startCheckingTimePosition);
 	                
 	            }
 
@@ -73637,7 +73631,7 @@
 /***/ function(module, exports) {
 
 	var path = 'player/player.html';
-	window.angular.module('ng').run(['$templateCache', function(c) { c.put(path, "\n    <div class=\"player md-whiteframe-z2\">\n\n        <md-slider class=\"slider\" aria-label=\"slider\" flex min=\"0\" max=\"100\" ng-model=\"currentTimePosition\" step=\"0.1\">\n        </md-slider>\n\n        <div class=\"player__content\">\n            <div class=\"player__left\">\n                <div class=\"now-playing__content\">\n                    <div class=\"now-playing__artist\">{{ track.artists[0].name }}</div>\n                    <div class=\"now-playing__track\">{{ track.name }}</div>\n                </div>\n                \n            </div>\n            <div class=\"player__middle\">\n                <div class=\"\">\n                    <md-button class=\"md-icon-button\" aria-label=\"More\" ng-click=\"star()\" ng-class=\"{\n                        'md-accent': isFavorited()\n                    }\">\n                        <md-icon class=\"material-icons\">favorite</md-icon>\n                    </md-button>\n\n                    <md-button class=\"md-icon-button\" aria-label=\"More\" ng-click=\"previous()\">\n                        <md-icon class=\"material-icons\">skip_previous</md-icon>\n                    </md-button>\n                    <md-button class=\"md-icon-button md-accent\" aria-label=\"More\" ng-click=\"pausePlay()\">\n                        <md-icon class=\"material-icons md-48\">{{ state === 'playing' ? 'pause_circle_filled' : 'play_circle_filled' }}</md-icon>\n                    </md-button>\n                    <md-button class=\"md-icon-button\" aria-label=\"More\" ng-click=\"next()\">\n                        <md-icon class=\"material-icons\">skip_next</md-icon>\n                    </md-button>\n                </div>\n            </div>\n\n        </div>\n        \n    </div>\n    ") }]);
+	window.angular.module('ng').run(['$templateCache', function(c) { c.put(path, "\n    <div class=\"player md-whiteframe-z2\">\n\n        <md-slider class=\"slider\" aria-label=\"slider\" flex min=\"0\" max=\"100\" ng-model=\"currentTimePosition\" ng-change=\"seek()\" step=\"0.1\">\n        </md-slider>\n\n        <div class=\"player__content\">\n            <div class=\"player__left\">\n                <div class=\"now-playing__content\">\n                    <div class=\"now-playing__artist\">{{ track.artists[0].name }}</div>\n                    <div class=\"now-playing__track\">{{ track.name }}</div>\n                </div>\n                \n            </div>\n            <div class=\"player__middle\">\n                <div class=\"\">\n                    <md-button class=\"md-icon-button\" aria-label=\"More\" ng-click=\"star()\" ng-class=\"{\n                        'md-accent': isFavorited()\n                    }\">\n                        <md-icon class=\"material-icons\">favorite</md-icon>\n                    </md-button>\n\n                    <md-button class=\"md-icon-button\" aria-label=\"More\" ng-click=\"previous()\">\n                        <md-icon class=\"material-icons\">skip_previous</md-icon>\n                    </md-button>\n                    <md-button class=\"md-icon-button md-accent\" aria-label=\"More\" ng-click=\"pausePlay()\">\n                        <md-icon class=\"material-icons md-48\">{{ state === 'playing' ? 'pause_circle_filled' : 'play_circle_filled' }}</md-icon>\n                    </md-button>\n                    <md-button class=\"md-icon-button\" aria-label=\"More\" ng-click=\"next()\">\n                        <md-icon class=\"material-icons\">skip_next</md-icon>\n                    </md-button>\n                </div>\n            </div>\n\n        </div>\n        \n    </div>\n    ") }]);
 	module.exports = path;
 
 /***/ },
@@ -73656,6 +73650,10 @@
 	            results: '='
 	        },
 	        controller: function($scope) {
+	            $scope.searchTypes = ['artists', 'albums', 'tracks'];
+	            $scope.noresults = function() {
+	                return !$scope.results[$scope.searchTypes[0]] && !$scope.results[$scope.searchTypes[1]] && !$scope.results[$scope.searchTypes[2]]
+	            }
 	            $scope.addAndPlay = addAndPlay;
 	            $scope.showPlaylist = showPlaylist;
 	            
@@ -73680,7 +73678,7 @@
 /***/ function(module, exports) {
 
 	var path = 'searchResults/searchResults.html';
-	window.angular.module('ng').run(['$templateCache', function(c) { c.put(path, "<md-list>\n    <md-subheader class=\"md-no-sticky\">Artists</md-subheader>\n    <md-list-item class=\"md-with-secondary--hover\" ng-repeat=\"artist in results.artists | limitTo: 3\" ng-click=\"showPlaylist(artist.uri)\">\n        <p>{{ artist.name }}</p>\n        <md-icon class=\"md-secondary material-icons\" ng-click=\"addAndPlay(artist.uri)\">play_arrow</md-icon>\n    </md-list-item>\n    \n    <md-divider></md-divider>\n\n    <md-subheader class=\"md-no-sticky\">Albums</md-subheader>\n    <md-list-item class=\"md-with-secondary--hover\" ng-repeat=\"album in results.albums | limitTo: 3\" ng-click=\"showPlaylist(album.uri)\">\n        <p>{{ album.name }}</p>\n        <md-icon class=\"md-secondary material-icons\" ng-click=\"addAndPlay(album.uri)\">play_arrow</md-icon>\n    </md-list-item>\n\n    <md-divider></md-divider>\n\n    <md-subheader class=\"md-no-sticky\">Tracks</md-subheader>\n    <md-list-item class=\"md-with-secondary--hover\" ng-repeat=\"track in results.tracks | limitTo: 10\" ng-click=\"showPlaylist(track.uri)\">\n        <p>{{ track.name }}</p>\n        <md-icon class=\"md-secondary material-icons\" ng-click=\"addAndPlay(track.uri)\">play_arrow</md-icon>\n    </md-list-item>\n    \n\n</md-list>\n") }]);
+	window.angular.module('ng').run(['$templateCache', function(c) { c.put(path, "<md-list>\n    <md-subheader class=\"md-warn\" ng-if=\"noresults()\">No results</md-subheader>\n    <md-subheader class=\"md-no-sticky\" ng-if=\"!noresults()\" ng-repeat-start=\"type in searchTypes\">{{ type }}</md-subheader>\n    <md-list-item class=\"md-with-secondary--hover\" ng-repeat=\"result in results[type] | limitTo: 3\" ng-click=\"showPlaylist(result.uri)\">\n        <p>{{ result.name }}</p>\n        <md-icon class=\"md-secondary material-icons\" ng-click=\"addAndPlay(result.uri)\">play_arrow</md-icon>\n    </md-list-item>\n    \n    <md-divider ng-repeat-end></md-divider>\n\n</md-list>\n") }]);
 	module.exports = path;
 
 /***/ },
@@ -73699,19 +73697,34 @@
 	            $scope.search = search;
 	            $scope.results;
 	            $scope.clearResults = clearResults;
+	            $scope.playlists = []
+	            $scope.isLoading = false
+
+	            getPlaylists();
+
+	            function getPlaylists() {
+	                $scope.isLoading = true;
+	                return Mopidy.execute('playlists.getPlaylists')
+	                    .then(function setPlaylists(playlists) {
+	                        $scope.isLoading = false;
+	                        $scope.playlists = playlists;
+	                    });
+	            }
 
 	            function clearResults() {
-	                debugger;
 	                $scope.results = undefined;
 	            }
 
 	            function search(term) {
+	                $scope.isLoadingSearch = true;
 	                Mopidy.execute('library.search', {
 	                    any: [term]
 	                })
-	                .then(function(res) {
-	                    $scope.results = res[0];
-	                })
+	                    .then(function(res) {
+	                        var idx = _.findIndex(res, { uri: 'spotify:search:' + encodeURI(term) });
+	                        $scope.isLoadingSearch = false;
+	                        $scope.results = res[idx];
+	                    })
 	            }
 	        }
 	    }
@@ -73724,7 +73737,7 @@
 /***/ function(module, exports) {
 
 	var path = 'playlists/container.html';
-	window.angular.module('ng').run(['$templateCache', function(c) { c.put(path, "<playlists-toolbar on-clear-search=\"clearResults()\" on-search=\"search(term)\"></playlists-toolbar>\n<playlists class=\"scrollable\" scrollable ng-if=\"!results\"></playlists>\n<search-results class=\"scrollable\" scrollable ng-if=\"results\" results=\"results\"></search-results>") }]);
+	window.angular.module('ng').run(['$templateCache', function(c) { c.put(path, "<playlists-toolbar on-clear-search=\"clearResults()\" on-search=\"search(term)\" is-loading=\"isLoadingSearch\"></playlists-toolbar>\n<div layout=\"row\" layout-margin layout-padding layout-align=\"center\" ng-if=\"isLoading\">\n    <md-progress-circular md-mode=\"indeterminate\"></md-progress-circular>\n</div>\n\n<playlists class=\"scrollable\" scrollable ng-if=\"!isLoading && !results\" playlists=\"playlists\"></playlists>\n<search-results class=\"scrollable\" scrollable ng-if=\"results\" results=\"results\"></search-results>") }]);
 	module.exports = path;
 
 /***/ },
@@ -73739,19 +73752,13 @@
 	    return {
 	        restrict: 'E',
 	        templateUrl: template,
+	        scope: {
+	            playlists: '='
+	        },
 	        controller: function($scope) {
-	            $scope.playlists = [];
 	            $scope.addAndPlay = addAndPlay;
 	            $scope.showPlaylist = showPlaylist;
-	            
-	            getPlaylists();
 
-	            function getPlaylists() {
-	                return Mopidy.execute('playlists.getPlaylists')
-	                .then(function setPlaylists(playlists) {
-	                    $scope.playlists = playlists;
-	                });
-	            }
 	            function addAndPlay (uri) {    
 	                return Mopidy.execute('tracklist.clear')
 	                .then(Mopidy.execute('tracklist.add', {uri: uri}))
@@ -73791,7 +73798,8 @@
 	        templateUrl: template,
 	        scope: {
 	            onSearch: '&',
-	            onClearSearch: '&'
+	            onClearSearch: '&',
+	            isLoading: '='
 	        },
 	        link: function($scope) {
 	            $scope.vm = {};
@@ -73800,11 +73808,14 @@
 	                $scope.onClearSearch({state: true});
 	            }
 
-	            $scope.$watch('vm.term', function(term) {
-	                if(term && term.length > 2) {
-	                    $scope.onSearch({term: term});
-	                }
-	            })
+	            $scope.$watch('vm.term', _.debounce(function(term) {
+	                // This code will be invoked after 200ms from last search
+	                $scope.$apply(function() {
+	                    if(term && term.length > 1) {
+	                        $scope.onSearch({term: term});
+	                    }
+	                });
+	            }, 200))
 	        }
 	    }
 	}
@@ -73816,7 +73827,7 @@
 /***/ function(module, exports) {
 
 	var path = 'playlists/toolbar.html';
-	window.angular.module('ng').run(['$templateCache', function(c) { c.put(path, "<toolbar>\n    <md-input-container md-no-float>\n        <md-icon class=\"material-icons search\">search</md-icon>\n        <input ng-model=\"vm.term\" type=\"text\" placeholder=\"Search\">\n    </md-input-container>\n    \n    <md-button ng-if=\"vm.term\" ng-click=\"vm.clear()\" class=\"md-icon-button\">\n        <md-icon class=\"material-icons\">close</md-icon>\n    </md-button>\n</toolbar>\n") }]);
+	window.angular.module('ng').run(['$templateCache', function(c) { c.put(path, "<toolbar>\n    <md-input-container md-no-float>\n        <md-icon class=\"material-icons search\" ng-if=\"!isLoading\">{{ !isLoading ? 'search' : '' }}</md-icon>\n        <md-icon ng-if=\"isLoading\">\n            <md-progress-circular class=\"md-accent md-hue-1 md-transform-top-left\" md-mode=\"indeterminate\" md-diameter=\"24\"></md-progress-circular>\n        </md-icon>\n        <input ng-model=\"vm.term\" type=\"text\" placeholder=\"Search\">\n    </md-input-container>\n    \n    <md-button ng-if=\"vm.term\" ng-click=\"vm.clear()\" class=\"md-icon-button\">\n        <md-icon class=\"material-icons\">close</md-icon>\n    </md-button>\n</toolbar>\n") }]);
 	module.exports = path;
 
 /***/ },

@@ -8,7 +8,8 @@ function PlaylistsToolbar($state, Mopidy) {
         templateUrl: template,
         scope: {
             onSearch: '&',
-            onClearSearch: '&'
+            onClearSearch: '&',
+            isLoading: '='
         },
         link: function($scope) {
             $scope.vm = {};
@@ -17,11 +18,14 @@ function PlaylistsToolbar($state, Mopidy) {
                 $scope.onClearSearch({state: true});
             }
 
-            $scope.$watch('vm.term', function(term) {
-                if(term && term.length > 2) {
-                    $scope.onSearch({term: term});
-                }
-            })
+            $scope.$watch('vm.term', _.debounce(function(term) {
+                // This code will be invoked after 200ms from last search
+                $scope.$apply(function() {
+                    if(term && term.length > 1) {
+                        $scope.onSearch({term: term});
+                    }
+                });
+            }, 200))
         }
     }
 }

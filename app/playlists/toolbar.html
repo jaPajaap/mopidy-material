@@ -1,6 +1,9 @@
 <toolbar>
     <md-input-container md-no-float>
-        <md-icon class="material-icons search">search</md-icon>
+        <md-icon class="material-icons search" ng-if="!isLoading">{{ !isLoading ? 'search' : '' }}</md-icon>
+        <md-icon ng-if="isLoading">
+            <md-progress-circular class="md-accent md-hue-1 md-transform-top-left" md-mode="indeterminate" md-diameter="24"></md-progress-circular>
+        </md-icon>
         <input ng-model="vm.term" type="text" placeholder="Search">
     </md-input-container>
     

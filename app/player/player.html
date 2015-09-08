@@ -1,7 +1,7 @@
 
     <div class="player md-whiteframe-z2">
 
-        <md-slider class="slider" aria-label="slider" flex min="0" max="100" ng-model="currentTimePosition" step="0.1">
+        <md-slider class="slider" aria-label="slider" flex min="0" max="100" ng-model="currentTimePosition" ng-change="seek()" step="0.1">
         </md-slider>
 
         <div class="player__content">

@@ -1,3 +1,7 @@
-<playlists-toolbar on-clear-search="clearResults()" on-search="search(term)"></playlists-toolbar>
-<playlists class="scrollable" scrollable ng-if="!results"></playlists>
+<playlists-toolbar on-clear-search="clearResults()" on-search="search(term)" is-loading="isLoadingSearch"></playlists-toolbar>
+<div layout="row" layout-margin layout-padding layout-align="center" ng-if="isLoading">
+    <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+</div>
+
+<playlists class="scrollable" scrollable ng-if="!isLoading && !results" playlists="playlists"></playlists>
 <search-results class="scrollable" scrollable ng-if="results" results="results"></search-results>
