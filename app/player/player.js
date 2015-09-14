@@ -11,8 +11,13 @@ function Player($rootScope, $interval, Util, Spotify, AppSettings, Mopidy, hotke
         },
         controller: function($scope) {
             var checkPositionTimer;
+            $scope.vm = {};
+
             $scope.state;
             $scope.track;
+            $scope.vm.volume;
+            $scope.mute;
+            $scope.isShownVolume = false;
             $scope.pausePlay = pausePlay;
             $scope.next = next;
             $scope.previous = previous;
@@ -21,6 +26,9 @@ function Player($rootScope, $interval, Util, Spotify, AppSettings, Mopidy, hotke
             $scope.Spotify = Spotify;
             $scope.favoritedTracks = []
             $scope.isFavorited = isFavorited;
+            $scope.vm.changeVolume = changeVolume;
+            $scope.toggleMute = toggleMute;
+            $scope.showVolume = showVolume;
 
             $scope.trackLength;
 
@@ -31,6 +39,10 @@ function Player($rootScope, $interval, Util, Spotify, AppSettings, Mopidy, hotke
             $rootScope.$on('mopidy:event:trackPlaybackResumed', handleTrackPlaybackResumed)
             $rootScope.$on('mopidy:event:trackPlaybackPaused', handleTrackPlaybackPaused)
             $rootScope.$on('mopidy:event:trackPlaybackEnded', handleTrackPlaybackEnded)
+            $rootScope.$on('mopidy:event:trackPlaybackEnded', handleTrackPlaybackEnded)
+            
+            $rootScope.$on('mopidy:event:volumeChanged', handleVolumeChanged)
+            $rootScope.$on('mopidy:event:muteChanged', handleMuteChanged)
 
             hotkeys.add({
                 combo: 'space',
@@ -44,9 +56,39 @@ function Player($rootScope, $interval, Util, Spotify, AppSettings, Mopidy, hotke
 
             function init() {
                 getFavorites();
+                getVolume()
+                    .then(setVolume);
                 return getState()
                     .then(setState)
                     .then(getCurrentTrack)
+            }
+
+            function getVolume() {
+                return Mopidy.execute('mixer.getVolume')
+            }
+
+            function setVolume(volume) {
+                $scope.vm.volume = volume;
+            }
+
+            function changeVolume() {
+                Mopidy.execute('playback.setVolume', {
+                    volume: $scope.vm.volume
+                })
+            }
+
+            function showVolume() {
+                $scope.isShownVolume = !$scope.isShownVolume
+            }
+
+            function setMute(mute) {
+                $scope.mute = mute;
+            }
+
+            function toggleMute() {
+                return Mopidy.execute('playback.setMute', {
+                    mute: !$scope.mute
+                })
             }
 
             function getState() {
@@ -74,7 +116,21 @@ function Player($rootScope, $interval, Util, Spotify, AppSettings, Mopidy, hotke
             }
 
             function handlePlaybackStateChange(e, args) {
+                console.log('handlePlaybackStateChange');
                 setState(args.new_state);
+            }
+
+            function handleVolumeChanged(e, args) {
+                console.log('handleVolumeChanged', args);
+                return $scope.$apply(function() {
+                    return setVolume(args.volume);
+                });
+            }
+
+            function handleMuteChanged(e, args) {
+                return $scope.$apply(function() {
+                    $scope.mute = args.mute;
+                });
             }
 
             function setState(state) {

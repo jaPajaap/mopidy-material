@@ -9,6 +9,11 @@
 @import 'styles/typography';
 //style
 
+
+//components
+@import 'components/tracklist/tracklist';
+
+
 html,
 body {
     overflow: hidden;
@@ -38,6 +43,7 @@ body {
     flex-direction: column;
     background-color: #fff;
     flex: 1;
+
     @include media(">=tablet") {
         margin: $half-space;
     }
@@ -120,13 +126,25 @@ progress-bar {
     background-color: pink;
 }
 
-.slider {
+.time-slider {
     position: absolute;
     width: 100%;
     z-index: 1;
     top: -24px;
     margin-left: 0;
     margin-right: 0;
+    // padding-left: 4px;
+    // padding-right: 4px;
+}
+
+.volume-slider {
+    position: absolute;
+    width: 100%;
+    z-index: 1;
+    top: -48px;
+    margin-left: 0;
+    margin-right: 0;
+    background-color: #fff;
     // padding-left: 4px;
     // padding-right: 4px;
 }
@@ -198,3 +216,5 @@ md-icon .material-icons {
 .md-transform-top-left {
     transform-origin: top left;
 }
+
+

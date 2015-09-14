@@ -1,0 +1,21 @@
+%truncate {
+    width: auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.track {
+    line-height: 20px;
+    padding: 8px;
+}
+
+.track__artist
+.track__name {
+    @extend %truncate;
+}
+
+.track__artist {
+    color: rgba(0,0,0,0.54);
+    font-size: 13px
+}

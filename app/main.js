@@ -9,7 +9,6 @@ require('angular-animate');
 require('angular-material');
 require('angular-hotkeys');
 require('angular-touch');
-// require('inobounce');
 
 
 require('./app.scss');
@@ -38,6 +37,9 @@ angular.module('app').service('Mopidy', require('./services/mopidy.js'));
 angular.module('app').service('Util', require('./services/util.js'));
 
 angular.module('app').directive('scrollable', require('./components/scrollable'));
+angular.module('app').directive('tracklist', require('./components/tracklist/tracklist.js'));
+
+
 
 angular.module('app').directive('container', require('./container/container'));
 angular.module('app').directive('player', require('./player/player'));
@@ -46,7 +48,6 @@ angular.module('app').directive('playlistsContainer', require('./playlists/conta
 angular.module('app').directive('playlists', require('./playlists/playlists'));
 angular.module('app').directive('playlistsToolbar', require('./playlists/toolbar'));
 angular.module('app').directive('playlistContainer', require('./playlist/container'));
-angular.module('app').directive('playlist', require('./playlist/playlist'));
 angular.module('app').directive('playlistToolbar', require('./playlist/toolbar'));
 angular.module('app').directive('settings', require('./settings/settings'));
 angular.module('app').directive('toolbar', require('./toolbar/toolbar'));
